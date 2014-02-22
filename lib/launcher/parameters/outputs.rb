@@ -8,9 +8,11 @@ module Launcher
     class Outputs < Hash
 
       def initialize
-        cloudformation.stacks.each do |stack|
-          stack.outputs.each do |output|
-            self[output.key] = output.value
+        if aws_configured?
+          cloudformation.stacks.each do |stack|
+            stack.outputs.each do |output|
+              self[output.key.to_sym] = output.value
+            end
           end
         end
       end
@@ -19,6 +21,10 @@ module Launcher
 
         def cloudformation
           AWS::CloudFormation.new Launcher::Config::AWS.configuration
+        end
+
+        def aws_configured?
+          Launcher::Config::AWS.configured?
         end
 
     end

@@ -27,7 +27,7 @@ module Launcher
       #
       # @return [Boolean] True if AWS configuration is present, false otherwise.
       def self.configured?
-        aws_configuration.length == 2
+        aws_configuration.length >= 2
       end
 
       # Retreives and attempts to discover all set AWS configuration 

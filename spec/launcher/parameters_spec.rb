@@ -4,7 +4,10 @@ require 'launcher/parameters'
 
 describe Launcher::Parameters do
 
-  before { @parameters = Launcher::Parameters.new }
+  before do
+    Launcher::Config::AWS.stub(:configured?) { false }
+    @parameters = Launcher::Parameters.new 
+  end
 
   subject { @parameters }
 

@@ -5,6 +5,7 @@ require 'terminal-table'
 require 'launcher/log'
 require 'launcher/parameters'
 require 'launcher/template'
+require 'launcher/launch'
 
 # require all configurables
 Dir[File.dirname(__FILE__) + "/cli/**/*.rb"].each {|file| require file }
@@ -38,7 +39,9 @@ module Launcher
       discovered = Launcher::Parameters.new(options[:params] || {}).all
       template = Launcher::Template.new(options[:template])
 
-      launcher = Launcher::Launch.new(options[:name], template, discovered)
+      Launcher::Launch.new(options[:name], template, discovered) do |message|
+        Launcher::Log.info message
+      end
     end
 
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
@@ -46,14 +49,10 @@ module Launcher
       Launcher::Config(options)
       discovered = Launcher::Parameters.new(options[:params] || {}).all
 
-      if discovered.count > 0
-        Launcher::Log.ok "Discovered #{discovered.count} parameters."
-        rows = []
-        discovered.each { |key, value| rows << [key, value] }
-        puts Terminal::Table.new :headings => ["Parameter", "Value"], :rows => rows
-      else
-        Launcher::Log.warn "No parameters were discovered."
-      end
+      Launcher::Log.ok "Discovered #{discovered.count} parameters."
+      rows = []
+      discovered.each { |key, value| rows << [key, value] }
+      puts Terminal::Table.new :headings => ["Parameter", "Value"], :rows => rows
     end
 
   end
