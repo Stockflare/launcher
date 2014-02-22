@@ -2,6 +2,8 @@ require 'thor'
 require 'launcher'
 require 'terminal-table'
 
+require 'launcher/cli/stack'
+
 require 'launcher/log'
 require 'launcher/parameters'
 require 'launcher/template'
@@ -28,21 +30,7 @@ module Launcher
     # Displays the current version of the installed Launcher gem on the command line.
     def version
       puts Launcher::VERSION
-    end
-
-    desc "launch", "Launch a new AWS Cloudformation template using discoverable parameters"
-    method_option :name, :type => :string, :aliases => "-n", :required => true
-    method_option :template, :type => :string, :aliases => "-t", :required => true
-    method_option :params, :type => :hash, :aliases => "-p"
-    def launch
-      Launcher::Config(options)
-      discovered = Launcher::Parameters.new(options[:params] || {}).all
-      template = Launcher::Template.new(options[:template])
-
-      Launcher::Launch.new(options[:name], template, discovered) do |message|
-        Launcher::Log.info message
-      end
-    end
+    end    
 
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
     def list
@@ -54,6 +42,9 @@ module Launcher
       discovered.each { |key, value| rows << [key, value] }
       puts Terminal::Table.new :headings => ["Parameter", "Value"], :rows => rows
     end
+
+    desc "launcher stack COMMAND ...ARGS", "Perform stack based commands."
+    subcommand "stack", Launcher::CLI::Stack
 
   end
 end

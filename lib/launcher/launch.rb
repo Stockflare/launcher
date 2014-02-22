@@ -7,18 +7,26 @@ module Launcher
 
     attr_reader :name, :template, :discovered_parameters
 
-    def initialize(name, template, params, &block)
-      @block = block
+    def initialize(name, template, params)
       @messages = []
       @name = name
       @template = template
       @discovered_parameters = params
-      create_cloudformation
     end
 
     def message(msg)
       @messages << msg
       @block.call(msg) if @block
+    end
+
+    def create(&block)
+      @block = block
+      create_cloudformation
+    end
+
+    def update(&block)
+      @block = block
+      update_cloudformation
     end
 
     def parameters
@@ -35,8 +43,13 @@ module Launcher
 
     private
 
+      def update_cloudformation
+        message "Attempting to update stack with name #{@name}"
+        cloudformation.stacks[@name].update parameters.merge(:template => @template.read)
+      end
+
       def create_cloudformation
-        message "Attempting to create stack with name #{name}."
+        message "Attempting to create stack with name #{@name}."
         cloudformation.stacks.create(@name, @template.read, parameters)
       end
 
