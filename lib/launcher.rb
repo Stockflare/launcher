@@ -1,5 +1,8 @@
 require "launcher/version"
+require "launcher/config"
 
 module Launcher
-  # Your code goes here...
+  def self.root
+    Gem::Specification.find_by_name("envdude").gem_dir
+  end
 end
