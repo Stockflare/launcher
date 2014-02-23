@@ -33,7 +33,7 @@ module Launcher
     desc "version", "Displays the current version number of Launcher."
     # Displays the current version of the installed Launcher gem on the command line.
     def version
-      puts Launcher::VERSION
+      Launcher::Log.info Launcher::VERSION
     end    
 
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
@@ -50,7 +50,7 @@ module Launcher
     def configuration
     end
 
-    desc "launcher stack COMMAND ...ARGS", "Perform stack based commands."
+    desc "stack COMMAND ...ARGS", "Perform stack based commands."
     subcommand "stack", Launcher::CLI::Stack
 
     private

@@ -15,14 +15,14 @@ module Launcher
       class_option :params, :type => :hash, :aliases => "-p"
       class_option :update, :type => :boolean, :default => false
 
-      desc "create", "Launch a new AWS Cloudformation template using discoverable parameters"
+      desc "stack create", "Launch a new AWS Cloudformation template using discoverable parameters"
       method_option :name, :type => :string, :aliases => "-n", :required => true
       method_option :template, :type => :string, :aliases => "-t", :required => true
       def create
         cloudformation(:create)
       end
 
-      desc "update", "Updates a pre-existing Cloudformation template."
+      desc "stack update", "Updates a pre-existing Cloudformation template."
       method_option :name, :type => :string, :aliases => "-n", :required => true
       method_option :template, :type => :string, :aliases => "-t", :required => true
       def update
