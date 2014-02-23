@@ -3,6 +3,8 @@ require 'json'
 module Launcher
   class Template
 
+    include Launcher::Message
+
     attr_reader :json, :file_path
 
     def initialize(file_path)
@@ -32,6 +34,17 @@ module Launcher
 
     def outputs
       @json[:Outputs]
+    end
+
+    def valid?
+      valid = true
+
+      if resources.keys.empty?
+        message "Atleast once templated resource must be defined.", :type => :fatal
+        valid = false
+      end
+
+      return valid
     end
 
     def defaulted_parameters

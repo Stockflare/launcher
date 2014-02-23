@@ -1,3 +1,6 @@
+require 'launcher/template'
+require 'launcher/stack'
+
 module Launcher
   class CLI < Thor
     # Provides AWS Cloudformation Stack based functionality.
@@ -32,8 +35,8 @@ module Launcher
           Launcher::Config(options)
           discovered = Launcher::Parameters.new(options[:params] || {}).all
           template = Launcher::Template.new(options[:template])
-          Launcher::Launch.new(options[:name], template, discovered).send(op) do |message|
-            Launcher::Log.info message
+          Launcher::Stack.new(options[:name], template, discovered).send(op) do |message, opts|
+            Launcher::Log.send(opts[:type] || :info, message)
           end
         end
 

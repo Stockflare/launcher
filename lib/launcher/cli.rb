@@ -6,8 +6,6 @@ require 'launcher/cli/stack'
 
 require 'launcher/log'
 require 'launcher/parameters'
-require 'launcher/template'
-require 'launcher/launch'
 
 # require all configurables
 Dir[File.dirname(__FILE__) + "/cli/**/*.rb"].each {|file| require file }
