@@ -2,12 +2,8 @@ language: ruby
 rvm:
 - 1.9.3
 - 2.1.0
-- jruby-18mode
-- jruby-19mode
 - 2.0.0-p353
 - ruby-head
-- jruby-head
-- ree
 notifications:
   flowdock:
     secure: DsRAudAp/S4TMM7je48yLK3cH5K/n5d8UxW1iGzqPdjyMZrZ5m9vK8LjLbTSdZIm+musdYiH+XLSOYlu0cdn906oo2ZOFMDNOGzUA33B56N+wm8aIXKZkXVUQpAjQRwr9iwC9VhuhHGXt37o74jSIZFSoOTuMv+T9NCHEnTrNug=
