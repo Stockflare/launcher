@@ -8,19 +8,7 @@ describe Launcher::Template do
 
   let(:file_path) { "file.cloudformation" }
 
-  let(:template) { 
-    { 
-      :Parameters => {
-        :Foo => { :Default => "bar" },
-        :Go => {}
-      }, 
-      :Mappings => {}, 
-      :Resources => {
-        :TestResource => {}
-      }, 
-      :Outputs => {} 
-    } 
-  }
+  let(:template) { build(:template) }
 
   before do
     File.open(file_path, "wb") do |f|

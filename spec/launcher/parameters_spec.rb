@@ -6,7 +6,7 @@ describe Launcher::Parameters do
 
   before do
     Launcher::Config::AWS.stub(:configured?) { false }
-    @parameters = Launcher::Parameters.new 
+    @parameters = build(:parameters)
   end
 
   subject { @parameters }
