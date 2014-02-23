@@ -33,7 +33,7 @@ module Launcher
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
     def list
       Launcher::Config(options)
-      discovered = Launcher::Parameters.new(options[:params] || {}).all
+      discovered = Launcher::Parameters.new.all
 
       Launcher::Log.ok "Discovered #{discovered.count} parameters."
       rows = []
