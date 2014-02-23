@@ -1,5 +1,7 @@
 # Launcher
 
+[![Build Status](https://travis-ci.org/davidkelley/launcher.png?branch=master)](https://travis-ci.org/davidkelley/launcher)
+
 The Launcher gem enables you to create, update, delete and interrogate your AWS Cloudformations within a specific region. 
 
 Whilst enabling you to easily launch your templates, it facilitates cross-dependencies in the form of parameter discovery. This allows
