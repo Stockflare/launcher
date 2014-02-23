@@ -12,6 +12,14 @@ module Launcher
       @json = JSON.parse(read, :symbolize_names => true)
     end
 
+    def name(splitter=".")
+      filename.split(splitter)[0]
+    end
+
+    def filename
+      Pathname.new(@file_path).basename.to_s
+    end
+
     def file
       File.open(@file_path, "rb")
     end
@@ -21,19 +29,19 @@ module Launcher
     end
 
     def parameters
-      @json[:Parameters]
+      @json[:Parameters].dup
     end
 
     def mappings
-      @json[:Mappings]
+      @json[:Mappings].dup
     end
 
     def resources
-      @json[:Resources]
+      @json[:Resources].dup
     end
 
     def outputs
-      @json[:Outputs]
+      @json[:Outputs].dup
     end
 
     def valid?

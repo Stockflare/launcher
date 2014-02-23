@@ -16,14 +16,14 @@ module Launcher
       class_option :update, :type => :boolean, :default => false
 
       desc "stack create", "Launch a new AWS Cloudformation template using discoverable parameters"
-      method_option :name, :type => :string, :aliases => "-n", :required => true
+      method_option :name, :type => :string, :aliases => "-n"
       method_option :template, :type => :string, :aliases => "-t", :required => true
       def create
         cloudformation(:create)
       end
 
       desc "stack update", "Updates a pre-existing Cloudformation template."
-      method_option :name, :type => :string, :aliases => "-n", :required => true
+      method_option :name, :type => :string, :aliases => "-n"
       method_option :template, :type => :string, :aliases => "-t", :required => true
       def update
         cloudformation(:update)
@@ -35,7 +35,8 @@ module Launcher
           Launcher::Config(options)
           discovered = Launcher::Parameters.new(options[:params] || {}).all
           template = Launcher::Template.new(options[:template])
-          Launcher::Stack.new(options[:name], template, discovered).send(op) do |message, opts|
+          name = options[:name] || template.name
+          Launcher::Stack.new(name, template, discovered).send(op) do |message, opts|
             Launcher::Log.send(opts[:type] || :info, message)
           end
         end

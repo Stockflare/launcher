@@ -70,6 +70,8 @@ Run `launcher help` to see an exhaustive list of available commands. Below are s
 
 ## Contributing
 
+A `Vagrantfile` has been setup to help you boot up an isolated development environment. Whilst this optional, it is definitely preferable. Check out [this blog post](http://davidkelley.me/development/2014/02/24/vagrant-chef-berkshelf-a-match-made-in-heaven.html) on getting started with Vagrant. 
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Write passing tests for your feature using [RSpec](http://betterspecs.org/) and [Cucumber](http://cukes.info/)/[Aruba](https://github.com/cucumber/aruba)

@@ -34,6 +34,8 @@ describe Launcher::Template do
   it { should respond_to(:file) }
   it { should respond_to(:json) }
   it { should respond_to(:file_path) }
+  it { should respond_to(:filename) }
+  it { should respond_to(:name) }
   it { should respond_to(:parameters) }
   it { should respond_to(:mappings) }
   it { should respond_to(:resources) }
@@ -42,6 +44,14 @@ describe Launcher::Template do
   it { should respond_to(:non_defaulted_parameters) }
 
   it { should be_valid }
+
+  it "should retrieve the correct filename" do
+    expect(@template.filename).to eq file_path
+  end
+
+  it "should retrieve the correct template name" do
+    expect(@template.name).to eq file_path.split(".")[0]
+  end
 
   describe "when there are no resources defined" do
     before { @template.stub(:resources) { {} } }
