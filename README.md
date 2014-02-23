@@ -62,11 +62,34 @@ Run `launcher help` to see an exhaustive list of available commands. Below are s
 
 ### Listing all discoverable parameters
 
+Currently, all discoverable parameters are retrieved from the outputs of pre-existing Cloudformations. **It is assumed that all keys are unique**.
+
+Once you have configured AWS correctly, running `launcher list` will display all the discovered keys and values that will be used to create and update your cloudformations.
+
 ### Describing existing Cloudformations
+
+TODO
 
 ### Launching a new Cloudformation
 
+You can launch a new cloudformation with several parameters, although only one is required (`--template`). If you choose to omit the name parameter, given a template
+file named `application.cloudformation.template`, a Cloudformation will be created with the name `application`. Such that any characters preceeding the first `.` will be used
+to form the name.
+
+#### Example of Launching a new Cloudformation
+
+    $ launcher stack create --name my_application --template path/to/my/application.template --params GitRepo:a_url ImageId:ami-38fa829h 
+
 ### Updating an existing Cloudformation
+
+You can update a Cloudformation at anytime using a command similar to:
+
+    $ launcher stack update --template path/to/my/my_application.template
+
+It is important to note here, that when compared with the previous example of creating a new template, the keys `GitRepo` and `ImageId` are now discoverable and therefore
+do not need to be supplied.
+
+Furthermore, the template filename in this example has been renamed to `my_application.template` and therefore, the name of the Cloudformation to update is now derivable.
 
 ## Contributing
 
