@@ -15,7 +15,9 @@ describe Launcher::Template do
         :Go => {}
       }, 
       :Mappings => {}, 
-      :Resources => {}, 
+      :Resources => {
+        :TestResource => {}
+      }, 
       :Outputs => {} 
     } 
   }
@@ -38,6 +40,13 @@ describe Launcher::Template do
   it { should respond_to(:outputs) }
   it { should respond_to(:defaulted_parameters) }
   it { should respond_to(:non_defaulted_parameters) }
+
+  it { should be_valid }
+
+  describe "when there are no resources defined" do
+    before { @template.stub(:resources) { {} } }
+    it { should_not be_valid }
+  end
 
   describe "when a new template is initialized" do
 
