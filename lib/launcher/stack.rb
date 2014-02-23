@@ -124,12 +124,20 @@ module Launcher
 
       def update_cloudformation
         message "Attempting to update stack with name #{@name}"
-        cloudformation.stacks[@name].update parameters.merge(:template => @template.read)
+        begin
+          cloudformation.stacks[@name].update parameters.merge(:template => @template.read)
+        rescue => e
+          message e.message, :type => :fatal
+        end
       end
 
       def create_cloudformation
         message "Attempting to create stack with name #{@name}."
-        cloudformation.stacks.create(@name, @template.read, parameters)
+        begin
+          cloudformation.stacks.create(@name, @template.read, parameters)
+        rescue => e
+          message e.message, :type => :fatal
+        end
       end
 
       def stack_events(stack)
