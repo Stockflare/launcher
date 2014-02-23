@@ -13,7 +13,6 @@ module Launcher
     class Stack < Thor
 
       class_option :params, :type => :hash, :aliases => "-p"
-      class_option :update, :type => :boolean, :default => false
 
       desc "stack create", "Launch a new AWS Cloudformation template using discoverable parameters"
       method_option :name, :type => :string, :aliases => "-n"
