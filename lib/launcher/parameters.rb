@@ -1,20 +1,24 @@
 require 'launcher/parameters/outputs'
+require 'launcher/parameters/resources'
 
 module Launcher
   # Discovers all parameters from passed parameters, configuration files and from 
   # pre-existing Cloudformation Stack outputs.
   class Parameters
 
-    attr_reader :outputs, :params, :configuration
+    attr_reader :outputs, :params, :configuration, :resources
 
     def initialize(params={})
-      @params = params
-      @configuration = {}
-      @outputs = Launcher::Parameters::Outputs.new
+      AWS.memoize do
+        @params = params
+        @configuration = {}
+        @resources = Launcher::Parameters::Resources.new
+        @outputs = Launcher::Parameters::Outputs.new
+      end
     end
 
     def all
-      {}.merge(@outputs).merge(@params).merge(@configuration)
+      {}.merge(@outputs).merge(@params).merge(@configuration).merge(@resources)
     end
 
     def [](key)

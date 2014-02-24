@@ -42,7 +42,10 @@ module Launcher
 
       Launcher::Log.ok "Discovered #{discovered.count} parameters."
       rows = []
-      discovered.each { |key, value| rows << [key, value] }
+      discovered.each { |key, value| 
+        val = value[0..30] + (value.length > 30 ? "..." : "")
+        rows << [key, val] 
+      }
       puts Terminal::Table.new :headings => ["Parameter", "Value"], :rows => rows
     end
 
