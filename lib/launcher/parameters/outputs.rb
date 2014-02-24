@@ -9,12 +9,16 @@ module Launcher
 
       def initialize
         if aws_configured?
-          cloudformation.stacks.each do |stack|
+          stacks.each do |stack|
             stack.outputs.each do |output|
               self[output.key.to_sym] = output.value
             end
           end
         end
+      end
+
+      def stacks
+        cloudformation.stacks
       end
 
       private

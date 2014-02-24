@@ -9,7 +9,7 @@ module Launcher
 
       def initialize
         if aws_configured?
-          cloudformation.stacks.each do |stack|
+          stacks.each do |stack|
             stack.resources.each do |resource|
               self[resource.logical_resource_id] = resource.physical_resource_id
             end
@@ -18,6 +18,10 @@ module Launcher
       end
 
       private
+
+        def stacks
+          cloudformation.stacks
+        end
 
         def cloudformation
           AWS::CloudFormation.new Launcher::Config::AWS.configuration
