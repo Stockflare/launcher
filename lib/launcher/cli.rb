@@ -39,14 +39,13 @@ module Launcher
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
     def list
       discovered = Launcher::Parameters.new.all
-
       Launcher::Log.ok "Discovered #{discovered.count} parameters."
       rows = []
       discovered.each { |key, value| 
         val = value[0..30] + (value.length > 30 ? "..." : "")
         rows << [key, val] 
       }
-      puts Terminal::Table.new :headings => ["Parameter", "Value"], :rows => rows
+      Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Parameter", "Value"], :rows => rows)
     end
 
     desc "configuration", "Lists the detected configuration that Launcher will use to connect with the AWS API."

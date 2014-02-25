@@ -45,7 +45,7 @@ module Launcher
             Launcher::Config(self::ConfigFile.configuration)
           end
         end
-        AWS.config(config)
+        ::AWS.config(config)
         config
       end
 
