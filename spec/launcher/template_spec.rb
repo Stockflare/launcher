@@ -19,6 +19,9 @@ describe Launcher::Template do
 
   subject { @template }
 
+  it { should be_kind_of(Launcher::Message) }
+  it_behaves_like "a class that stores messages"
+
   it { should respond_to(:file) }
   it { should respond_to(:json) }
   it { should respond_to(:file_path) }

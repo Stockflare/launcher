@@ -24,6 +24,9 @@ describe Launcher::Stack do
 
   subject { @stack }
 
+  it { should be_kind_of(Launcher::Message) }
+  it_behaves_like "a class that stores messages"
+
   it { should respond_to(:create) }
   it { should respond_to(:update) }
   it { should respond_to(:parameters) }

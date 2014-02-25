@@ -23,6 +23,7 @@ module Launcher
 
       desc "stack update", "Updates a pre-existing Cloudformation template."
       method_option :name, :type => :string, :aliases => "-n"
+      method_option :config_files, :type => :array, :aliases => "-c"
       method_option :template, :type => :string, :aliases => "-t", :required => true
       def update
         cloudformation(:update)

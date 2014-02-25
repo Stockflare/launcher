@@ -24,7 +24,7 @@ module Launcher
         end
 
         def cloudformation
-          AWS::CloudFormation.new Launcher::Config::AWS.configuration
+          AWS::CloudFormation.new
         end
 
         def aws_configured?

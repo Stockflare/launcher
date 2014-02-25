@@ -37,14 +37,16 @@ module Launcher
       #
       # @return [Hash,Nil] the current AWS Configuration values
       def self.configuration
-        if aws_configuration.length < 2
+        config = aws_configuration
+        if config.length < 2
           if self::Environment.present?
             Launcher::Config(self::Environment.configuration)
           elsif self::ConfigFile.present?
             Launcher::Config(self::ConfigFile.configuration)
           end
         end
-        aws_configuration
+        AWS.config(config)
+        config
       end
 
       private

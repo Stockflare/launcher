@@ -1,5 +1,6 @@
 require 'launcher/parameters/outputs'
 require 'launcher/parameters/resources'
+require 'launcher/parameters/configs'
 
 module Launcher
   # Discovers all parameters from passed parameters, configuration files and from 
@@ -11,7 +12,7 @@ module Launcher
     def initialize(params={})
       AWS.memoize do
         @params = params
-        @configuration = {}
+        @configuration = Launcher::Parameters::Configs.new
         @resources = Launcher::Parameters::Resources.new
         @outputs = Launcher::Parameters::Outputs.new
       end
