@@ -1,6 +1,6 @@
 # Launcher
 
-[![Build Status](https://travis-ci.org/davidkelley/launcher.png?branch=master)](https://travis-ci.org/davidkelley/launcher) [![Code Climate](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/badges/dd3aa794571db1563173/gpa.png)](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/feed) [![Dependency Status](https://gemnasium.com/davidkelley/launcher.png)](https://gemnasium.com/davidkelley/launcher)
+[![Coverage Status](https://coveralls.io/repos/davidkelley/launcher/badge.png?branch=master)](https://coveralls.io/r/davidkelley/launcher?branch=master) [![Build Status](https://travis-ci.org/davidkelley/launcher.png?branch=master)](https://travis-ci.org/davidkelley/launcher) [![Code Climate](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/badges/dd3aa794571db1563173/gpa.png)](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/feed) [![Dependency Status](https://gemnasium.com/davidkelley/launcher.png)](https://gemnasium.com/davidkelley/launcher)
 
 
 The Launcher gem enables you to create, update, delete and interrogate your AWS Cloudformations within a specific region. 
