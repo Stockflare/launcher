@@ -1,6 +1,9 @@
 require "codeclimate-test-reporter"
 CodeClimate::TestReporter.start
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'pp'
 require 'fakefs/spec_helpers'
 require 'factory_girl'
