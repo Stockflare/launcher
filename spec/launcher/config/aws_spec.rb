@@ -11,18 +11,40 @@ describe Launcher::Config::AWS do
     expect(subject).to_not be_nil
   end
 
-  it "should set configuration" do
-    Launcher::Config(test_data)
-    subject.configuration.should == test_data
+  describe "when configuration is set" do
+    before {
+      Launcher::Config(test_data)
+    }
+
+    it "should set configuration" do
+      expect(subject.configuration).to eq test_data
+    end
+
+    it "should filter configuration" do
+      Launcher::Config(test_data.merge(:another_key => true))
+      expect(subject.configuration).to eq test_data
+    end
+
+    it "should return a specific key" do
+      expect(subject[test_data.keys.first]).to eq test_data.values.first
+    end
+
+    it "should be configured?" do
+      expect(subject.configured?).to be_true
+    end
   end
 
-  it "should filter configuration" do
-    Launcher::Config(test_data.merge(:another_key => true))
-    subject.configuration.should == test_data
-  end
+  describe "when configuration is not set" do
 
-  it "should return a specific key" do
-    subject[test_data.keys.first].should == test_data.values.first
+    before { Launcher::Config.delete!(:access_key_id, :secret_access_key) }
+
+    it "should not be configured?" do
+      expect(subject.configured?).to_not be_true
+    end
+
+    it "should not return configuration" do
+      expect(subject.configuration).to eq({})
+    end
   end
 
 end

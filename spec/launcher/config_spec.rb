@@ -32,4 +32,9 @@ describe Launcher::Config do
     expect(subject.select(:non_existing_key)).to be_empty
   end
 
+  it "should delete a key" do
+    Launcher::Config.delete!(:a)
+    expect(subject.select(:a, :b)).to eq({:b => "b"})
+  end
+
 end
