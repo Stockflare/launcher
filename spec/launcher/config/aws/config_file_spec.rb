@@ -8,15 +8,7 @@ describe Launcher::Config::AWS::ConfigFile do
   include FakeFS::SpecHelpers
 
   let(:file_path) { "config" }
-
-  let(:config_contents) {
-    <<-LONG
-    [default]
-    aws_access_key_id=foo
-    aws_secret_access_key=bar
-    LONG
-  }
-
+  
   before {
     Launcher::Config::AWS::ConfigFile.stub(:path) { file_path }
   }
@@ -27,7 +19,9 @@ describe Launcher::Config::AWS::ConfigFile do
 
     before do
       File.open(file_path, "wb") do |f|
-        f.write config_contents.to_yaml
+        f.puts "[default]"
+        f.puts "aws_access_key_id=foo"
+        f.puts "aws_secret_access_key=bar"
       end
     end
 
