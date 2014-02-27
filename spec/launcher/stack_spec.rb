@@ -77,6 +77,15 @@ describe Launcher::Stack do
         }.to yield_control.at_least(1)
       end
     end
+
+    describe "when a cloudformation does not exist" do
+      it "should raise an error" do
+        @stack.should_receive(:message) do |msg, opts|
+          expect(opts[:type]).to eq(:fatal) if opts && opts.include?(:type)
+        end
+        @stack.update
+      end
+    end
     
   end
 

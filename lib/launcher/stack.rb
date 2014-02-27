@@ -140,18 +140,6 @@ module Launcher
         end
       end
 
-      def stack_events(stack)
-        finished = false
-        last = nil
-        until finished 
-          events = stacks.events
-          if events.last != last
-            
-          end
-          sleep 10
-        end
-      end
-
       def cloudformation
         AWS::CloudFormation.new Launcher::Config::AWS.configuration
       end
