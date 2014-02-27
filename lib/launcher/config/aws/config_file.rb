@@ -31,7 +31,7 @@ module Launcher
                 key, value = line.split('=')
                 if (key && value)
                   key.gsub!(/aws_/, '')
-                  configuration[:"#{key}"] = value.gsub!(/^[ ]+|[ ]+$|\n/,'')
+                  configuration[key.strip.to_sym] = value.gsub!(/^[ ]+|[ ]+$|\n/,'')
                 end
               end
               return configuration
