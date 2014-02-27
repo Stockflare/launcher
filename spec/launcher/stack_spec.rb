@@ -10,6 +10,7 @@ describe Launcher::Stack do
   let(:file_path) { "file.cloudformation" }
   let(:template) { build(:template) }
   let(:parameters) { build(:parameters) }
+  let(:name) { "test" }
 
   before { 
     Launcher::Config::AWS.stub(:configured?) { false }
@@ -19,7 +20,7 @@ describe Launcher::Stack do
     end
 
     @template = Launcher::Template.new(file_path)
-    @stack = Launcher::Stack.new("test", @template, parameters.all)
+    @stack = Launcher::Stack.new(name, @template, parameters.all)
   }
 
   subject { @stack }
@@ -36,6 +37,48 @@ describe Launcher::Stack do
   it { should respond_to(:valid?) }
 
   it { should be_valid }
+
+  describe "as a cloudformation is created" do
+
+    it "should create a cloudformation" do
+      expect { @stack.create }.to_not raise_error
+    end
+
+    it "should send a message" do
+      expect { |b|
+        @stack.message_handler &b
+        @stack.create
+      }.to yield_control.at_least(1)
+    end
+  end
+
+  describe "as a cloudformation is updated" do
+
+    describe "when the cloudformation exists" do
+
+      before {
+        AWS::CloudFormation.stub(:stacks) {
+          {
+            "#{name}" => class CloudformationStack 
+              def update(*); end
+            end.new
+          }
+        }
+      }
+
+      it "should update an existing cloudformation" do
+        expect { @stack.update }.to_not raise_error
+      end
+
+      it "should send a message" do
+        expect { |b|
+          @stack.message_handler &b
+          @stack.update
+        }.to yield_control.at_least(1)
+      end
+    end
+    
+  end
 
   describe "when parameters are missing" do
     before { @stack.stub(:missing_parameters?) { true } }
