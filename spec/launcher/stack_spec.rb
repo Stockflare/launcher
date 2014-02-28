@@ -94,6 +94,43 @@ describe Launcher::Stack do
     
   end
 
+  describe "as a cloudformation is deleted" do
+
+    describe "when the cloudformation exists" do
+
+      before {
+        AWS::CloudFormation.stub(:stacks) {
+          {
+            "#{name}" => class CloudformationStack 
+              def update(*); end
+            end.new
+          }
+        }
+      }
+
+      it "should delete an existing cloudformation" do
+        expect { @stack.delete }.to_not raise_error
+      end
+
+      it "should send a message" do
+        expect { |b|
+          @stack.message_handler &b
+          @stack.delete
+        }.to yield_control.at_least(1)
+      end
+    end
+
+    describe "when a cloudformation does not exist" do
+      it "should raise an error" do
+        @stack.should_receive(:message).at_least(:once) do |msg, opts|
+          expect(opts[:type]).to eq(:fatal) if opts && opts.include?(:type)
+        end
+        @stack.delete
+      end
+    end
+    
+  end
+
   describe "when parameters are missing" do
     before { @stack.stub(:missing_parameters?) { true } }
     it { should_not be_valid }

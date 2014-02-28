@@ -7,6 +7,7 @@ require 'launcher/cli/template'
 
 require 'launcher/log'
 require 'launcher/parameters'
+require 'launcher/stacks'
 
 # require all configurables
 Dir[File.dirname(__FILE__) + "/cli/**/*.rb"].each {|file| require file }
@@ -52,6 +53,16 @@ module Launcher
         rows << [key, val] 
       }
       Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
+    end
+
+    desc "stacks", "Lists the status and other information for all AWS Cloudformation Stacks."
+    # Displays a table within the command line describing the current status and other information
+    # for every Cloudformation that is currently launched.
+    # For more help on this command, use `launcher help list` from the command line.
+    def stacks
+      rows = []
+      Launcher::Stacks.new.all_statuses { |s| rows << [s[:name], s[:updated_at], s[:status]] }
+      Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Name", "Updated At", "Status"], :rows => rows)
     end
 
     desc "stack COMMAND ...ARGS", "Perform stack based commands."

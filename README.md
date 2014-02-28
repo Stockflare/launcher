@@ -69,9 +69,42 @@ Currently, all discoverable parameters are retrieved from the outputs of pre-exi
 
 Once you have configured AWS correctly, running `launcher list` will display all the discovered keys and values that will be used to create and update your cloudformations.
 
+You can also apply a positive filter to the list of parameters that are returned, by passing in a Ruby Regular Expression. This can be done via the `--filter` flag.
+
+Note in the following example, the use of single quotes (`'...'`) to enclose the regular expression. Using double quotes (`"..."`) causes Ruby to evaluate and subsequently escape special characters, such as `\A`.
+
+For example, passing in a filter such as `--filter 'Subnet[A-C]\Z'` would return all discovered parameters in a table similar to the following:
+
+```
++----------------+-----------------+
+| Key            | Value           |
++----------------+-----------------+
+| PrivateSubnetB | subnet-ab212cdf |
+| PublicSubnetB  | subnet-94212ce0 |
+| PrivateSubnetA | subnet-9e9d7dfb |
+| PublicSubnetC  | subnet-ee3e13a8 |
+| PrivateSubnetC | subnet-ef3e13a9 |
+| PublicSubnetA  | subnet-999d7dfc |
++----------------+-----------------+
+```
+
 ### Describing existing Cloudformations
 
-TODO
+Launcher provides the ability to retrieve the current statuses for all your existing Cloudformations. This command is a handy way of interrogating the status of your stacks, without having to login or tab to the AWS Console.
+
+Using the command `launcher stacks` will output a table similar to the following:
+
+```
++---------------+-------------------------+-----------------+
+| Name          | Updated At              | Status          |
++---------------+-------------------------+-----------------+
+| network       | 2014-02-12 21:37:08 UTC | CREATE_COMPLETE |
+| chef-server   | 2014-02-12 21:49:10 UTC | CREATE_COMPLETE |
+| rabbitmq      | 2014-02-28 22:56:57 UTC | CREATE_COMPLETE |
+| resources     | 2014-02-28 23:02:32 UTC | CREATE_COMPLETE |
+| api           | 2014-02-28 23:20:45 UTC | CREATE_COMPLETE |
++---------------+-------------------------+-----------------+
+```
 
 ### Launching a new Cloudformation
 

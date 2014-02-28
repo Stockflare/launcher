@@ -30,7 +30,7 @@ describe Launcher::Parameters::Resources do
   end
 
   it "should contain the test resource keys" do
-    expect(@resources.keys).to eq(["test_logical_id"])
+    expect(@resources.keys).to eq([:test_logical_id])
   end
 
   it "should contain the test resource values" do
