@@ -1,7 +1,7 @@
 require 'aws-sdk'
 
 module Launcher
-  class Parameters
+  class Parameters < Hash
     # This class upon initialization will use defined AWS Access credentials
     # to discover all existing Cloudformation Ouput keys and values for the default
     # or defined AWS Region.
@@ -17,6 +17,11 @@ module Launcher
         end
       end
 
+      # Retrieves an AWS::Cloudformation::StackCollection object containing
+      # an enumerable list of pre-existing Cloudformation stacks that have been
+      # detected using the credentials defined.
+      #
+      # @return [AWS::Cloudformation::StackCollection] collection of existing stacks.
       def stacks
         cloudformation.stacks
       end

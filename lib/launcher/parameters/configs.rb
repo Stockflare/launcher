@@ -1,7 +1,7 @@
 require 'aws-sdk'
 
 module Launcher
-  class Parameters
+  class Parameters < Hash
     # This class upon initialization will use defined AWS Access credentials
     # to discover all existing Cloudformation Ouput keys and values for the default
     # or defined AWS Region.
@@ -22,6 +22,10 @@ module Launcher
         end
       end
 
+      # Returns the :config_files key that has been set within the {Launcher::Config}.
+      # @note Whilst it cannot be guaranteed, the contents of this key are expected to be an Array.
+      #
+      # @return [Array] list of configuration files to discover parameters from..
       def configuration_files
         Launcher::Config[:config_files]
       end

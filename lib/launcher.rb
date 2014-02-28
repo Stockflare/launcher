@@ -1,8 +1,14 @@
 require "launcher/version"
 require "launcher/config"
 
+# The Launcher module provides a mix of helper classes aimed at providing
+# AWS Cloudformation interaction either through the command line, or programatically
+# from another class or gem.
 module Launcher
 
+  # Determine the path to where this gem currently resides on the host filesystem
+  #
+  # @return [String] the filepath to where this gem is located.
   def self.root
     Gem::Specification.find_by_name("envdude").gem_dir
   end
@@ -25,7 +31,7 @@ module Launcher
     # Binds a message handler to proc a block when a message
     # is added to the messages array.
     #
-    # @params [Proc] message_proc the block to call when a message is added. 
+    # @param [Proc] message_proc the block to call when a message is added. 
     def message_handler(&message_proc)
       @message_proc = message_proc
     end

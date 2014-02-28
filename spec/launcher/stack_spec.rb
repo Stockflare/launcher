@@ -9,19 +9,23 @@ describe Launcher::Stack do
 
   let(:file_path) { "file.cloudformation" }
   let(:template) { build(:template) }
-  let(:parameters) { build(:parameters) }
+  #let(:test_params) { { :foo => "bar", :x => "y" } }
   let(:name) { "test" }
 
   before { 
     Launcher::Config::AWS.stub(:configured?) { false }
+    Launcher::Config(:params => template[:Parameters])
 
     File.open(file_path, "wb") do |f|
       f.write template.to_json
     end
 
     @template = Launcher::Template.new(file_path)
-    @stack = Launcher::Stack.new(name, @template, parameters.all)
+    @parameters = Launcher::Parameters.new
+    @stack = Launcher::Stack.new(name, @template, @parameters)
   }
+
+  after { Launcher::Config.delete!(:params) }
 
   subject { @stack }
 
@@ -80,7 +84,7 @@ describe Launcher::Stack do
 
     describe "when a cloudformation does not exist" do
       it "should raise an error" do
-        @stack.should_receive(:message) do |msg, opts|
+        @stack.should_receive(:message).at_least(:once) do |msg, opts|
           expect(opts[:type]).to eq(:fatal) if opts && opts.include?(:type)
         end
         @stack.update

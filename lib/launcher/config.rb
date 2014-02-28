@@ -58,7 +58,7 @@ module Launcher
     # @example Usage
     #   Launcher::Config.delete!(:one, :or, :more, :keys)
     #
-    # @param [Symbol] key(s) of the values to delete.
+    # @param [Symbol] keys of the values to delete.
     # @return [Hash] the values that have been deleted
     def self.delete!(*keys)
       keys.each { |k| @@_.delete(k.to_sym) }

@@ -2,7 +2,15 @@ require "logger"
 require "colored"
 
 module Launcher
+  # The Log class provides a static interface to output text to STDOUT.
+  # It provides helpful messages types such as debug, error and ok. On
+  # most command line interfaces, {Launcher::Log} will also output text
+  # from various messages types in an appropriate color.
+  #
+  # @example Sending a log message
+  #   Launcher::Log.fatal "My fatal error is", eexception.class.name
   class Log
+
 
     %w(debug error info warn fatal ok).each do |type|
       define_singleton_method(type) do |*msgs|
@@ -10,6 +18,11 @@ module Launcher
       end
     end
 
+    # Print an OK log message using a concatenation of various strings
+    # that have been passed in.
+    #
+    # @example Sending an OK Message
+    #   Launcher::Log.ok "Hello", username # => "Hello David"
     def self.ok(*msgs)
       print color(format_msg("OK", *msgs.join(' ')), :ok)
     end

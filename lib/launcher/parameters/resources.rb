@@ -1,7 +1,7 @@
 require 'aws-sdk'
 
 module Launcher
-  class Parameters
+  class Parameters < Hash
     # This class, upon initialization interrogates the resources created 
     # by a Cloudformation for their logical resource ID. If a resource does
     # no have one, it is not included.

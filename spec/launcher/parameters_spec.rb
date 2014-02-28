@@ -8,29 +8,20 @@ describe Launcher::Parameters do
 
   before do
     Launcher::Config::AWS.stub(:configured?) { false }
-    @parameters = build(:parameters)
-    @parameters_with_values = Launcher::Parameters.new(test_values)
+    Launcher::Config(:params => test_values)
+    @parameters_with_values = Launcher::Parameters.new
   end
 
-  subject { @parameters }
+  after { Launcher::Config.delete!(:params) }
 
-  it { should respond_to(:outputs) }
-  it { should respond_to(:params) }
-  it { should respond_to(:configuration) }
-  it { should respond_to(:all) }
+  subject { @parameters_with_values }
+
   it { should respond_to(:[]) }
   it { should respond_to(:select) }
+  it { should respond_to(:filter) }
+  it { should respond_to(:filtered?) }
 
-  describe "return value of #all" do
-    
-    it "should be a hash" do
-      expect(@parameters_with_values.all).to be_a(Hash)
-    end
-
-    it "should return the initialized values" do
-      expect(@parameters_with_values.all).to eq(test_values)
-    end
-  end
+  it { should be_a_kind_of(Hash) }
 
   describe "return value of #[](key)" do
 
@@ -48,20 +39,46 @@ describe Launcher::Parameters do
 
   end
 
-  describe "return value of #select" do
+  describe "return value of #filter" do
+    describe "when a filter is defined" do
 
-    it "should be a hash" do
-      expect(@parameters_with_values.select(:foo, :bar)).to be_a(Hash)
+      before { Launcher::Config(:filter => 'fo+') }
+      after { Launcher::Config.delete!(:filter) }
+
+      it "should return a regular expression" do
+        expect(@parameters_with_values.filter).to be_a(Regexp)
+      end
+
     end
 
-    it "should match the keys defined" do
-      expect(@parameters_with_values.select(*test_values.keys).keys).to eq test_values.keys
+    describe "when a filter is not defined" do
+      it "should return nil" do
+        expect(@parameters_with_values.filter).to be_nil
+      end
+    end
+  end
+
+  describe "return value of #filtered?" do
+    describe "when a filter is defined" do
+
+      before { Launcher::Config(:filter => '\Afr[a-z]nce?\Z') }
+      after { Launcher::Config.delete!(:filter) }
+
+      it "should not filter out a matching key" do
+        expect(@parameters_with_values.filtered?('franc')).to be_false
+      end
+
+      it "should filter a non-matching key" do
+        expect(@parameters_with_values.filtered?('fr0nce')).to be_true
+      end
+
     end
 
-    it "should return a hash of the keys and values defined" do
-      expect(@parameters_with_values.select(*test_values.keys)).to eq test_values
+    describe "when a filter is not defined" do
+      it "should not filter out any keys" do
+        expect(@parameters_with_values.filtered?('franc')).to be_false
+      end
     end
-
   end
   
 end

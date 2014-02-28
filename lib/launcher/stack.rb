@@ -76,8 +76,8 @@ module Launcher
       }
     end
 
-    # {Hash} of the filtered parameter set for use within the Cloudformation. This
-    # single depth, key => value {Hash} is the list of parameters that are not defaulted
+    # Hash of the filtered parameter set for use within the Cloudformation. This
+    # single depth, key => value Hash is the list of parameters that are not defaulted
     # and cannot be discovered.
     #
     # @return [Hash] Set of parameters that cannot be discovered and will be passed into the Cloudformation.
