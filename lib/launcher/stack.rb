@@ -62,6 +62,12 @@ module Launcher
       update_cloudformation if valid?
     end
 
+    # Delete a pre-existing cloudformation given the name that it has been
+    # initialized with.
+    def delete
+      delete_cloudformation
+    end
+
     # Retrieves the URL from the Amazon API that determines the estimated cost for the
     # loaded cloudformation template.
     #
@@ -143,24 +149,25 @@ module Launcher
 
     private
 
+      def delete_cloudformation
+        message "Attempting to delete stack with name #{@name}"
+        with_cloudformation { |cf| cf.stacks[@name].delete }
+      end
+
       def update_cloudformation
-        begin 
-          if aws_configured?
-            message "Attempting to update stack with name #{@name}"
-            cloudformation.stacks[@name].update parameters.merge(:template => @template.read)
-          else
-            raise new Error "AWS not configured."
-          end
-        rescue => e
-          message e.message, :type => :fatal
-        end
+        message "Attempting to update stack with name #{@name}"
+        with_cloudformation { |cf| cf.stacks[@name].update parameters.merge(:template => @template.read) }
       end
 
       def create_cloudformation
+        message "Attempting to create stack with name #{@name}."
+        with_cloudformation { |cf| cf.stacks.create(@name, @template.read, parameters) }
+      end
+
+      def with_cloudformation(&block)
         begin
           if aws_configured?
-            message "Attempting to create stack with name #{@name}."
-            cloudformation.stacks.create(@name, @template.read, parameters)
+            block.call(cloudormation)
           else
             raise new Error "AWS not configured."
           end

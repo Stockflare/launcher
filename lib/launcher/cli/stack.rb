@@ -15,9 +15,9 @@ module Launcher
       class_option :params, :type => :hash, :aliases => "-p"
       class_option :name, :type => :string, :aliases => "-n"
       class_option :config_files, :type => :array, :aliases => "-c"
-      class_option :template, :type => :string, :aliases => "-t", :required => true
 
       desc "stack create", "Launch a new AWS Cloudformation template using discoverable parameters"
+      method_option :template, :type => :string, :aliases => "-t", :required => true
       # This CLI command launches a new Cloudformation given the provided arguments passed to it.
       # For more help on this command, use `launcher help create` from the command line.
       def create
@@ -25,6 +25,7 @@ module Launcher
       end
 
       desc "stack update", "Updates a pre-existing Cloudformation template."
+      method_option :template, :type => :string, :aliases => "-t", :required => true
       # This CLI command updates an pre-existing AWS Cloudformation template, updating parameters.
       # For more help on this command, use `launcher help update` from the command line.
       def update
@@ -32,10 +33,17 @@ module Launcher
       end
 
       desc "stack cost", "Retrieves a URL that provides an estimate cost this template."
+      method_option :template, :type => :string, :aliases => "-t", :required => true
       # This CLI command retrieves a URL from the AWS API that provides an estimate cost for the template.
       # For more help on this command, use `launcher help update` from the command line.
       def cost
         cloudformation(:cost)
+      end
+
+      desc "stack delete", "Delete a pre-existing Cloudformation template."
+      method_option :name, :type => :string, :requied => true, :aliases => "-n"
+      def delete
+        #cloudformation(:delete)
       end
 
       private
