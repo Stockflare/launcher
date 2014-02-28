@@ -151,7 +151,10 @@ module Launcher
 
       def delete_cloudformation
         message "Attempting to delete stack with name #{@name}"
-        with_cloudformation { |cf| cf.stacks[@name].delete }
+        with_cloudformation { |cf| 
+          cf.stacks[@name].delete 
+          message "Deleting Cloudformation with name #{@name}.", :type => :ok
+        }
       end
 
       def update_cloudformation
@@ -164,10 +167,10 @@ module Launcher
         with_cloudformation { |cf| cf.stacks.create(@name, @template.read, parameters) }
       end
 
-      def with_cloudformation(&block)
+      def with_cloudformation
         begin
           if aws_configured?
-            block.call(cloudormation)
+            yield cloudformation
           else
             raise new Error "AWS not configured."
           end

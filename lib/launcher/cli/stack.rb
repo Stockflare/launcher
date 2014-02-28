@@ -32,18 +32,20 @@ module Launcher
         cloudformation(:update)
       end
 
+      desc "stack delete", "Delete a pre-existing Cloudformation template."
+      method_option :name, :type => :string, :requied => true, :aliases => "-n"
+      # This CLI command commences the deletion of a pre-existing AWS Cloudformation
+      # For more help on this command, use `launcher help update` from the command line.
+      def delete
+        cloudformation(:delete)
+      end
+
       desc "stack cost", "Retrieves a URL that provides an estimate cost this template."
       method_option :template, :type => :string, :aliases => "-t", :required => true
       # This CLI command retrieves a URL from the AWS API that provides an estimate cost for the template.
       # For more help on this command, use `launcher help update` from the command line.
       def cost
         cloudformation(:cost)
-      end
-
-      desc "stack delete", "Delete a pre-existing Cloudformation template."
-      method_option :name, :type => :string, :requied => true, :aliases => "-n"
-      def delete
-        #cloudformation(:delete)
       end
 
       private
@@ -60,7 +62,7 @@ module Launcher
         end
 
         def template
-          template = Launcher::Template.new(options[:template])
+          @template ||= Launcher::Template.new(options[:template]) if options[:template]
         end
 
         def name 

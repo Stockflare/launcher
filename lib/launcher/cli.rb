@@ -39,19 +39,19 @@ module Launcher
     end    
 
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
-    method_option :filter, :type => :string, :desc => "Filter parameter keys returned using a regular expression."
+    method_option :filter, :type => :string, :desc => "Filter parameter keys returned using a regular expression (use single quotes)."
     # Displays a table within the command line of all the parameters that have been discovered, or those that have 
     # passed through a provided regular expression filter.
     # For more help on this command, use `launcher help list` from the command line.
     def list
-      discovered = Launcher::Parameters.new.all
+      discovered = Launcher::Parameters.new
       Launcher::Log.ok "Discovered #{discovered.count} parameters."
       rows = []
       discovered.each { |key, value| 
         val = value[0..30] + (value.length > 30 ? "..." : "")
-        rows << [key, val] 
+        rows << [key, val, key.class.name] 
       }
-      Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
+      Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value",""], :rows => rows)
     end
 
     desc "stack COMMAND ...ARGS", "Perform stack based commands."

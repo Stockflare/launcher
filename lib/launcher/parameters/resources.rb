@@ -11,7 +11,7 @@ module Launcher
         if aws_configured?
           stacks.each do |stack|
             stack.resources.each do |resource|
-              self[resource.logical_resource_id] = resource.physical_resource_id
+              self[resource.logical_resource_id.to_sym] = resource.physical_resource_id
             end
           end
         end
