@@ -49,9 +49,9 @@ module Launcher
       rows = []
       discovered.each { |key, value| 
         val = value[0..30] + (value.length > 30 ? "..." : "")
-        rows << [key, val, key.class.name] 
+        rows << [key, val] 
       }
-      Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value",""], :rows => rows)
+      Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
     end
 
     desc "stack COMMAND ...ARGS", "Perform stack based commands."
