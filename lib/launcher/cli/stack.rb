@@ -36,13 +36,21 @@ module Launcher
       private
 
         def cloudformation(op)
-          Launcher::Config(options)
-          discovered = Launcher::Parameters.new(options[:params] || {}).all
-          template = Launcher::Template.new(options[:template])
-          name = options[:name] || template.name
           Launcher::Stack.new(name, template, discovered).send(op) do |message, opts|
             Launcher::Log.send(opts[:type] || :info, message)
           end
+        end
+
+        def discovered
+          Launcher::Parameters.new(options[:params] || {}).all
+        end
+
+        def template
+          template = Launcher::Template.new(options[:template])
+        end
+
+        def name 
+          options[:name] || template.name
         end
 
     end

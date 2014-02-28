@@ -34,8 +34,6 @@ describe Launcher::Template do
   it { should respond_to(:defaulted_parameters) }
   it { should respond_to(:non_defaulted_parameters) }
 
-  it { should be_valid }
-
   it "should retrieve the correct filename" do
     expect(@template.filename).to eq file_path
   end
@@ -44,9 +42,67 @@ describe Launcher::Template do
     expect(@template.name).to eq file_path.split(".")[0]
   end
 
-  describe "when there are no resources defined" do
-    before { @template.stub(:resources) { {} } }
-    it { should_not be_valid }
+  describe "the return of valid?" do
+
+    describe "when the template is valid" do
+      describe "when AWS is configured" do
+        before {
+          Launcher::Config::AWS.stub(:configured?) { true }
+          AWS::CloudFormation.any_instance.stub(:validate_template) { {} }
+        }
+
+        it "should not send any message" do
+          expect { |b|
+            @template.message_handler &b
+            @template.valid?
+          }.to_not yield_control
+        end
+
+        it { should be_valid }
+
+      end
+    end
+
+    describe "when the template is not valid" do
+
+      describe "when there are no resources defined" do
+        before { @template.stub(:resources) { {} } }
+        it { should_not be_valid }
+      end
+
+      describe "when AWS is not configured" do
+        before { Launcher::Config::AWS.stub(:configured?) { false } }
+
+        it "should send a warning message" do
+          @template.should_receive(:message).at_least(:once) do |msg, opts|
+            expect(opts[:type]).to eq(:warn) if opts && opts.include?(:type)
+          end
+          @template.valid?
+        end
+      end
+
+      describe "when AWS is configured" do
+
+        let(:aws_error_message) { "The template is invalid" }
+
+        before {
+          Launcher::Config::AWS.stub(:configured?) { true }
+          AWS::CloudFormation.any_instance.stub(:validate_template) { 
+            { :message => aws_error_message } 
+          }
+        }
+
+        it "should send the message" do
+          @template.should_receive(:message).at_least(:once) do |msg, opts|
+            expect(msg).to eq(aws_error_message)
+          end
+          @template.valid?
+        end
+
+        it { should_not be_valid }
+      end
+    end
+
   end
 
   describe "when a new template is initialized" do

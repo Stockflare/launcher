@@ -88,6 +88,16 @@ module Launcher
     def valid?
       valid = true
 
+      if aws_configured?
+        validation = cloudformation.validate_template(read)
+        if validation.has_key?(:message)
+          message validation[:message], :type => :fatal
+          valid = false
+        end
+      else
+        message "Skipped AWS Cloudformation template validation.", :type => :warn
+      end
+
       if resources.keys.empty?
         message "Atleast once templated resource must be defined.", :type => :fatal
         valid = false
@@ -111,6 +121,16 @@ module Launcher
     def non_defaulted_parameters
       parameters.reject { |k| defaulted_parameters.keys.include?(k) }
     end
+
+    private
+
+      def cloudformation
+        AWS::CloudFormation.new
+      end
+
+      def aws_configured?
+        Launcher::Config::AWS.configured?
+      end
 
   end
 end
