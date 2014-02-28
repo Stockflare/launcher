@@ -3,6 +3,7 @@ require 'launcher'
 require 'terminal-table'
 
 require 'launcher/cli/stack'
+require 'launcher/cli/template'
 
 require 'launcher/log'
 require 'launcher/parameters'
@@ -57,17 +58,33 @@ module Launcher
     # The stack subcommand class, accessed via the command line using `launcher stack ...`
     subcommand "stack", Launcher::CLI::Stack
 
+    desc "template COMMAND ...ARGS", "Perform cloudformation template based commands."
+    # The stack subcommand class, accessed via the command line using `launcher stack ...`
+    subcommand "template", Launcher::CLI::Template
+
     private
 
+      def aws_configuration
+        Launcher::Config::AWS.configuration
+      end
+
+      def aws_configured?
+        aws_configuration.has_key?(:access_key_id) && aws_configuration.has_key?(:secret_access_key)
+      end
+
+      def masked_aws_secret
+        secret = aws_configuration[:secret_access_key]
+        secret.slice(0, secret.length/3) + "..." + secret.slice(-3, 3)
+      end
+
       def describe_aws_configuration
-        configuration = Launcher::Config::AWS.configuration
-        unless configuration.empty?
-          Launcher::Log.info "Using Region #{configuration[:region]}"
-          secret_access_key = configuration[:secret_access_key]
-          masked_secret = secret_access_key.slice(0, secret_access_key.length/2)
-          Launcher::Log.info "Using Access Key #{configuration[:access_key_id]} with secret #{masked_secret}..."
+        if aws_configured?
+          config = aws_configuration
+          Launcher::Log.info "AWS Region #{config[:region]}"
+          Launcher::Log.info "AWS Access Key #{config[:access_key_id]}"
+          Launcher::Log.info "AWS Secret Access Key #{masked_aws_secret}"
         else
-          Launcher::Log.error "No AWS Configuration detected."
+          Launcher::Log.warn "No AWS config detected."
         end
       end
 

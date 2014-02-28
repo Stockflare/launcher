@@ -17,9 +17,11 @@ module Launcher
       # passed, the AWS Validation service will be used.
       # For more help on this command, use `launcher help update` from the command line.
       def validate
+        
         template.message_handler do |msg, opts|
           Launcher::Log.send(opts[:type] || :info, msg)
         end
+
         if template.valid?
           template.message "The template is valid.", :type => :ok
         else
@@ -30,7 +32,7 @@ module Launcher
       private
 
         def template
-          Launcher::Template.new(options[:template])
+          @template ||= Launcher::Template.new(options[:template])
         end
 
     end

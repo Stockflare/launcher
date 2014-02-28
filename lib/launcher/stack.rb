@@ -10,10 +10,11 @@ module Launcher
   #
   # @example Creating a new Cloudformation programatically
   #   template = Launcher::Template.new(options[:template])
-  #   Launcher::Stack.new("foo", template).create do |message|
+  #   stack = Launcher::Stack.new("foo", template) do |message|
   #     #output event messages as they happen
   #     puts message
   #   end
+  #   stack.create
   class Stack
 
     include Launcher::Message
@@ -23,10 +24,11 @@ module Launcher
     # Creates a new instance of {Launcher::Stack}. Setting the template name,
     # the template and setting the discovered parameters to be passed to the
     # Cloudformation.
-    def initialize(name, template, params = {})
+    def initialize(name, template, params = {}, &block)
       @name = name
       @template = template
       @discovered_parameters = params
+      message_handler &block if block
     end
 
     # Creates a new AWS Cloudformation using a name, template and an
@@ -34,12 +36,12 @@ module Launcher
     #
     # @example Creating a new Cloudformation programatically
     #   template = Launcher::Template.new(options[:template])
-    #   Launcher::Stack.new("foo", template).create do |message|
+    #   stack = Launcher::Stack.new("foo", template) do |message|
     #     #output event messages as they happen
     #     puts message
     #   end
-    def create(&block)
-      message_handler &block if block
+    #   stack.create
+    def create
       create_cloudformation if valid?
     end
 
@@ -51,13 +53,32 @@ module Launcher
     #
     # @example Creating a new Cloudformation programatically
     #   template = Launcher::Template.new(options[:template])
-    #   Launcher::Stack.new("foo", template).create do |message|
+    #   stack = Launcher::Stack.new("foo", template) do |message|
     #     #output event messages as they happen
     #     puts message
     #   end
-    def update(&block)
-      message_handler &block if block
+    #   stack.update
+    def update
       update_cloudformation if valid?
+    end
+
+    # Retrieves the URL from the Amazon API that determines the estimated cost for the
+    # loaded cloudformation template.
+    #
+    # @example Retrieving the URL to estimate the template cost.
+    #   template = Launcher::Template.new(options[:template])
+    #   stack = Launcher::Stack.new("foo", template)
+    #   url = stack.cost
+    #
+    # @return [String] the url to estimate the template cost.
+    def cost
+      if aws_configured? && valid?
+        url = cloudformation.estimate_template_cost(@template.read, filtered_parameters)
+        message url, :type => :ok
+        return url
+      else
+        message "AWS not configured.", :type => :fatal
+      end
     end
 
     # The parameters array that will be passed into the Cloudformation during 
@@ -123,25 +144,37 @@ module Launcher
     private
 
       def update_cloudformation
-        message "Attempting to update stack with name #{@name}"
-        begin
-          cloudformation.stacks[@name].update parameters.merge(:template => @template.read)
+        begin 
+          if aws_configured?
+            message "Attempting to update stack with name #{@name}"
+            cloudformation.stacks[@name].update parameters.merge(:template => @template.read)
+          else
+            raise new Error "AWS not configured."
+          end
         rescue => e
           message e.message, :type => :fatal
         end
       end
 
       def create_cloudformation
-        message "Attempting to create stack with name #{@name}."
         begin
-          cloudformation.stacks.create(@name, @template.read, parameters)
+          if aws_configured?
+            message "Attempting to create stack with name #{@name}."
+            cloudformation.stacks.create(@name, @template.read, parameters)
+          else
+            raise new Error "AWS not configured."
+          end
         rescue => e
           message e.message, :type => :fatal
         end
       end
 
+      def aws_configured?
+        Launcher::Config::AWS.configured?
+      end
+
       def cloudformation
-        AWS::CloudFormation.new Launcher::Config::AWS.configuration
+        AWS::CloudFormation.new
       end
       
   end
