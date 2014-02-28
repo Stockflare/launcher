@@ -34,6 +34,7 @@ describe Launcher::Stack do
 
   it { should respond_to(:create) }
   it { should respond_to(:update) }
+  it { should respond_to(:cost) }
   it { should respond_to(:parameters) }
   it { should respond_to(:filtered_parameters) }
   it { should respond_to(:missing_parameters) }
@@ -117,6 +118,51 @@ describe Launcher::Stack do
       it "should include filtered parameters to be sent to the cloudformation" do
         expect(@stack.parameters[:parameters]).to eq @stack.filtered_parameters
       end
+    end
+  end
+
+  describe "return value of #cost" do
+
+    describe "when AWS is configured" do
+
+      let(:test_url) { "http://test-url.com" }
+
+      before {
+        Launcher::Config::AWS.stub(:configured?) { true }
+        Launcher::Stack.any_instance.stub(:valid?) { true }
+        AWS::CloudFormation.any_instance.stub(:estimate_template_cost) { test_url }
+      }
+
+      it "should send a message" do
+        @stack.should_receive(:message).at_least(:once) do |msg, opts|
+          expect(opts[:type]).to eq(:ok) if opts && opts.include?(:ok)
+        end
+        @stack.cost
+      end
+
+      it "should send a message containing the url" do
+        @stack.should_receive(:message).at_least(:once) do |msg, opts|
+          expect(msg).to eq(test_url)
+        end
+        @stack.cost
+      end
+
+      it "should return a string" do
+        expect(@stack.cost).to be_a(String)
+      end
+
+      it "should return a url" do
+        expect(@stack.cost).to eq(test_url)
+      end
+
+    end
+
+    describe "when AWS is not configured" do
+
+      it "should return nil" do
+        expect(@stack.cost).to be_nil
+      end
+
     end
   end
 

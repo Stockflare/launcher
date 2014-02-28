@@ -33,6 +33,7 @@ module Launcher
 
       desc "stack cost", "Retrieves a URL that provides an estimate cost this template."
       # This CLI command retrieves a URL from the AWS API that provides an estimate cost for the template.
+      # For more help on this command, use `launcher help update` from the command line.
       def cost
         cloudformation(:cost)
       end
