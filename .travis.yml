@@ -17,6 +17,9 @@ deploy:
   bucket: launcher.koala.im
   skip_cleanup: true
   local-dir: doc
+  edge: true
+  region: eu-west-1
+  endpoint: s3-eu-west-1.amazonaws.com
 addons:
   code_climate:
     repo_token:
