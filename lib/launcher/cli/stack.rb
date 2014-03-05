@@ -48,6 +48,40 @@ module Launcher
         cloudformation(:cost)
       end
 
+      desc "stack simulate", "Simulates the creation or update of an AWS Cloudformation."
+      method_option :template, :type => :string, :aliases => "-t", :required => true
+      # This CLI command simulates and outputs various information that would be used to
+      # create or update an AWS Cloudformation. 
+      def simulate
+        stack = Launcher::Stack.new(name, template, discovered) { |message, opts|
+          Launcher::Log.send(opts[:type] || :info, message)
+        }
+        if stack.valid?
+          Launcher::Log.ok "Stack would be launched with ID \"#{name}\""
+
+          discovered = stack.filtered_parameters
+          unless discovered.empty?
+            Launcher::Log.ok "With discovered parameters:"
+            rows = []
+            discovered.each { |k, v| rows << [k, v] }
+            Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)  
+          else
+            Launcher::Log.warn "No discoverable parameters found."
+          end
+
+          defaulted = template.defaulted_parameters
+          unless defaulted.empty?
+            Launcher::Log.ok "With defaulted parameters:"
+            rows = []
+            defaulted.each { |k, v| rows << [k, v[:Default]] }
+            Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
+          else
+            Launcher::Log.warn "No defaulted parameters found."
+          end
+        end
+
+      end
+
       private
 
         def cloudformation(op)
