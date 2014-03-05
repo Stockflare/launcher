@@ -7,6 +7,19 @@ rvm:
 notifications:
   flowdock:
     secure: DsRAudAp/S4TMM7je48yLK3cH5K/n5d8UxW1iGzqPdjyMZrZ5m9vK8LjLbTSdZIm+musdYiH+XLSOYlu0cdn906oo2ZOFMDNOGzUA33B56N+wm8aIXKZkXVUQpAjQRwr9iwC9VhuhHGXt37o74jSIZFSoOTuMv+T9NCHEnTrNug=
+before_deploy:
+- yard doc
+deploy:
+  provider: s3
+  access_key_id: AKIAIQXC7KNC6CPV3RMA
+  secret_access_key:
+    secure: BxXsmI87z/ffb8aA+0hbGHlxZk/c6ikhe7lsUoP9CqIfhmTkrZl+GiyLvWTaq6QIt1QnxgPXjKLzpiDZfRJPiaFKHCQLtfXVvpN/lTt8Pvl3XSuzYCQICVxKmQFIHSbt/aO6taayMrIwalxKfg1tUVC+3IoxCxrI2TwU2q/cohM=
+  bucket: launcher.koala.im
+  skip_cleanup: true
+  local-dir: doc
+  edge: true
+  region: eu-west-1
+  endpoint: s3-eu-west-1.amazonaws.com
 addons:
   code_climate:
     repo_token:
