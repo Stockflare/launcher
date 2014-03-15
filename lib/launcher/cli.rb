@@ -83,17 +83,11 @@ module Launcher
         aws_configuration.has_key?(:access_key_id) && aws_configuration.has_key?(:secret_access_key)
       end
 
-      def masked_aws_secret
-        secret = aws_configuration[:secret_access_key]
-        secret.slice(0, secret.length/3) + "..." + secret.slice(-3, 3)
-      end
-
       def describe_aws_configuration
         if aws_configured?
           config = aws_configuration
           Launcher::Log.info "AWS Region #{config[:region]}"
           Launcher::Log.info "AWS Access Key #{config[:access_key_id]}"
-          Launcher::Log.info "AWS Secret Access Key #{masked_aws_secret}"
         else
           Launcher::Log.warn "No AWS config detected."
         end
