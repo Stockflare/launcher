@@ -215,7 +215,7 @@ describe Launcher::Stack do
 
       describe "return value of #missing_parameters?" do
         it "should be false" do
-          expect(@stack.missing_parameters?).to be_false
+          expect(@stack.missing_parameters?).to be_falsey
         end
       end
     end
@@ -234,7 +234,7 @@ describe Launcher::Stack do
 
       describe "return value of #missing_parameters?" do
         it "should be true" do
-          expect(@stack.missing_parameters?).to be_true
+          expect(@stack.missing_parameters?).to be_truthy
         end
       end
     end

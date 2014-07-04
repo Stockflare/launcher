@@ -30,7 +30,7 @@ describe Launcher::Config::AWS do
     end
 
     it "should be configured?" do
-      expect(subject.configured?).to be_true
+      expect(subject.configured?).to be_truthy
     end
   end
 
@@ -39,7 +39,7 @@ describe Launcher::Config::AWS do
     before { Launcher::Config.delete!(:access_key_id, :secret_access_key) }
 
     it "should not be configured?" do
-      expect(subject.configured?).to_not be_true
+      expect(subject.configured?).to_not be_truthy
     end
 
     it "should not return configuration" do

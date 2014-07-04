@@ -65,20 +65,20 @@ describe Launcher::Parameters do
       after { Launcher::Config.delete!(:filter) }
 
       it "should not filter out a matching key" do
-        expect(@parameters_with_values.filtered?('franc')).to be_false
+        expect(@parameters_with_values.filtered?('franc')).to be_falsey
       end
 
       it "should filter a non-matching key" do
-        expect(@parameters_with_values.filtered?('fr0nce')).to be_true
+        expect(@parameters_with_values.filtered?('fr0nce')).to be_truthy
       end
 
     end
 
     describe "when a filter is not defined" do
       it "should not filter out any keys" do
-        expect(@parameters_with_values.filtered?('franc')).to be_false
+        expect(@parameters_with_values.filtered?('franc')).to be_falsey
       end
     end
   end
-  
+
 end

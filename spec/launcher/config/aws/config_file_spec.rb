@@ -8,7 +8,7 @@ describe Launcher::Config::AWS::ConfigFile do
   include FakeFS::SpecHelpers
 
   let(:file_path) { "config" }
-  
+
   before {
     Launcher::Config::AWS::ConfigFile.stub(:path) { file_path }
   }
@@ -26,7 +26,7 @@ describe Launcher::Config::AWS::ConfigFile do
     end
 
     it "should be present" do
-      expect(subject.present?).to be_true
+      expect(subject.present?).to be_truthy
     end
 
     describe "return value of configuration" do
@@ -51,7 +51,7 @@ describe Launcher::Config::AWS::ConfigFile do
   describe "when a config file does not exist" do
 
     it "should not be present" do
-      expect(subject.present?).to_not be_true
+      expect(subject.present?).to_not be_truthy
     end
 
   end

@@ -15,7 +15,7 @@ describe Launcher::Config::AWS::Environment do
     end
 
     it "should be present" do
-      expect(subject.present?).to be_true
+      expect(subject.present?).to be_truthy
     end
 
     describe "return value of configuration" do
@@ -59,7 +59,7 @@ describe Launcher::Config::AWS::Environment do
     end
 
     it "should not be present" do
-      expect(subject.present?).to_not be_true
+      expect(subject.present?).to_not be_truthy
     end
 
   end
