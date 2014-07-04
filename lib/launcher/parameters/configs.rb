@@ -33,7 +33,7 @@ module Launcher
       private
 
         def load_and_set(filepath)
-          YAML::load_file(filepath)[:parameters].each do |key, value|
+          YAML::load_file(filepath)['parameters'].each do |key, value|
             if value.is_a?(String)
               self[key.to_sym] = value
             else

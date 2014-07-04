@@ -8,7 +8,8 @@ module Launcher
     class Options < Hash
 
       def initialize(key=:params)
-        self.merge!(Launcher::Config[key] || {})
+        Launcher::Config[key].each { |k,v| self[k.to_sym] = v }
+      rescue
       end
 
     end

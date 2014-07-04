@@ -16,6 +16,11 @@ module Launcher
       class_option :name, :type => :string, :aliases => "-n"
       class_option :config_files, :type => :array, :aliases => "-c"
 
+      def initialize(*args)
+        super
+        Launcher::Config(options)
+      end
+
       desc "stack create", "Launch a new AWS Cloudformation template using discoverable parameters"
       method_option :template, :type => :string, :aliases => "-t", :required => true
       # This CLI command launches a new Cloudformation given the provided arguments passed to it.
@@ -51,7 +56,7 @@ module Launcher
       desc "stack simulate", "Simulates the creation or update of an AWS Cloudformation."
       method_option :template, :type => :string, :aliases => "-t", :required => true
       # This CLI command simulates and outputs various information that would be used to
-      # create or update an AWS Cloudformation. 
+      # create or update an AWS Cloudformation.
       def simulate
         stack = Launcher::Stack.new(name, template, discovered) { |message, opts|
           Launcher::Log.send(opts[:type] || :info, message)
@@ -64,7 +69,7 @@ module Launcher
             Launcher::Log.ok "With discovered parameters:"
             rows = []
             discovered.each { |k, v| rows << [k, v] }
-            Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)  
+            Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
           else
             Launcher::Log.warn "No discoverable parameters found."
           end
@@ -99,7 +104,7 @@ module Launcher
           @template ||= Launcher::Template.new(options[:template]) if options[:template]
         end
 
-        def name 
+        def name
           options[:name] || template.name
         end
 

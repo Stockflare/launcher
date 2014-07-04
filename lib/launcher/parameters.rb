@@ -4,7 +4,7 @@ require 'launcher/parameters/resources'
 require 'launcher/parameters/configs'
 
 module Launcher
-  # Discovers all parameters from passed parameters, configuration files and from 
+  # Discovers all parameters from passed parameters, configuration files and from
   # pre-existing Cloudformation Stack outputs.
   class Parameters < Hash
 
