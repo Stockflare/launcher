@@ -1,3 +1,5 @@
+require 'aws-sdk'
+
 require "launcher/version"
 require "launcher/config"
 
@@ -11,6 +13,17 @@ module Launcher
   # @return [String] the filepath to where this gem is located.
   def self.root
     Gem::Specification.find_by_name("envdude").gem_dir
+  end
+
+  # Initializes and returns a new Cloudformation client, using the configured
+  # or discovered credential information from the client.
+  #
+  # @note Multiple calls to this method will return the same instantiated
+  #   object.
+  #
+  # @return [Aws::Cloudformation::Client] an initialized client
+  def self.cloudformation_client
+    @client ||= Aws::CloudFormation::Client.new Launcher::Config::AWS.configuration
   end
 
   # Provides classes with the ability to store messages for consumption
@@ -31,7 +44,7 @@ module Launcher
     # Binds a message handler to proc a block when a message
     # is added to the messages array.
     #
-    # @param [Proc] message_proc the block to call when a message is added. 
+    # @param [Proc] message_proc the block to call when a message is added.
     def message_handler(&message_proc)
       @message_proc = message_proc
     end

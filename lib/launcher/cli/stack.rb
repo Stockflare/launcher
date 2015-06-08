@@ -58,30 +58,28 @@ module Launcher
       # This CLI command simulates and outputs various information that would be used to
       # create or update an AWS Cloudformation.
       def simulate
-        stack = Launcher::Stack.new(name, template, discovered) { |message, opts|
-          Launcher::Log.send(opts[:type] || :info, message)
-        }
+        stack = Launcher::Stack.new(name, template, discovered, &method(:to_log))
         if stack.valid?
-          Launcher::Log.ok "Stack would be launched with ID \"#{name}\""
+          to_log "Stack would be launched with ID \"#{name}\"", :ok
 
           discovered = stack.filtered_parameters
           unless discovered.empty?
-            Launcher::Log.ok "With discovered parameters:"
+            to_log "With discovered parameters:", :ok
             rows = []
             discovered.each { |k, v| rows << [k, v] }
-            Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
+            to_log "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows), :ok
           else
-            Launcher::Log.warn "No discoverable parameters found."
+            to_log "No discoverable parameters found.", :warn
           end
 
           defaulted = template.defaulted_parameters
           unless defaulted.empty?
-            Launcher::Log.ok "With defaulted parameters:"
+            to_log "With defaulted parameters:", :ok
             rows = []
             defaulted.each { |k, v| rows << [k, v[:Default]] }
-            Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
+            to_log "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows), :ok
           else
-            Launcher::Log.warn "No defaulted parameters found."
+            to_log "No defaulted parameters found.", :warn
           end
         end
 
@@ -90,10 +88,7 @@ module Launcher
       private
 
         def cloudformation(op)
-          stack = Launcher::Stack.new(name, template, discovered) { |message, opts|
-            Launcher::Log.send(opts[:type] || :info, message)
-          }
-          stack.send(op)
+          Launcher::Stack.new(name, template, discovered, &method(:to_log)).send(op)
         end
 
         def discovered
@@ -106,6 +101,11 @@ module Launcher
 
         def name
           options[:name] || template.name
+        end
+
+        def to_log(message, opts = {})
+          opts = { type: opts } if opts.is_a? Symbol
+          Launcher::Log.send(opts[:type] || :info, message)
         end
 
     end

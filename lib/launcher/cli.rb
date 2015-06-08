@@ -22,9 +22,10 @@ module Launcher
 
     package_name "Launcher"
 
-    class_option :access_key_id, :type => :string
-    class_option :secret_access_key, :type => :string
-    class_option :region, :type => :string, :default => "eu-west-1"
+    class_option :access_key_id, type: :string
+    class_option :secret_access_key, type: :string
+    class_option :region, type: :string, default: 'us-east-1'
+    class_option :profile, type: :string, default: 'default'
 
     def initialize(*args)
       super
@@ -37,20 +38,20 @@ module Launcher
     # For more help on this command, use `launcher help version` from the command line.
     def version
       Launcher::Log.info Launcher::VERSION
-    end    
+    end
 
     desc "list", "List all automatically discoverable AWS Cloudformation Parameters"
     method_option :filter, :type => :string, :desc => "Filter parameter keys returned using a regular expression (use single quotes)."
-    # Displays a table within the command line of all the parameters that have been discovered, or those that have 
+    # Displays a table within the command line of all the parameters that have been discovered, or those that have
     # passed through a provided regular expression filter.
     # For more help on this command, use `launcher help list` from the command line.
     def list
       discovered = Launcher::Parameters.new
       Launcher::Log.ok "Discovered #{discovered.count} parameters."
       rows = []
-      discovered.each { |key, value| 
+      discovered.each { |key, value|
         val = value[0..30] + (value.length > 30 ? "..." : "")
-        rows << [key, val] 
+        rows << [key, val]
       }
       Launcher::Log.ok "\n", Terminal::Table.new(:headings => ["Key", "Value"], :rows => rows)
     end

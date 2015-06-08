@@ -1,6 +1,5 @@
 require 'launcher/parameters/outputs'
 require 'launcher/parameters/options'
-require 'launcher/parameters/resources'
 require 'launcher/parameters/configs'
 
 module Launcher
@@ -9,12 +8,10 @@ module Launcher
   class Parameters < Hash
 
     def initialize
-      AWS.memoize do
-        [:options, :configs, :resources, :outputs].each do |c|
-          self.merge!(Launcher::Parameters.const_get(c.to_s.capitalize).new)
-        end
-        self.reject! { |k| filtered?(k) }
+      [:options, :configs, :outputs].each do |c|
+        self.merge!(Launcher::Parameters.const_get(c.to_s.capitalize).new)
       end
+      self.reject! { |k| filtered?(k) }
     end
 
     # Returns the current filter that has been used to filter out keys

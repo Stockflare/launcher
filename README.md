@@ -1,9 +1,9 @@
 # Launcher
 
-[![Coverage Status](https://coveralls.io/repos/davidkelley/launcher/badge.png?branch=master)](https://coveralls.io/r/davidkelley/launcher?branch=master) [![Build Status](https://travis-ci.org/davidkelley/launcher.png?branch=master)](https://travis-ci.org/davidkelley/launcher) [![Code Climate](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/badges/dd3aa794571db1563173/gpa.png)](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/feed) [![Dependency Status](https://gemnasium.com/davidkelley/launcher.png)](https://gemnasium.com/davidkelley/launcher)
+[![Coverage Status](https://coveralls.io/repos/davidkelley/launcher/badge.png?branch=master)](https://coveralls.io/r/davidkelley/launcher?branch=master) [![Build Status](https://travis-ci.org/Stockflare/launcher.svg?branch=master)](https://travis-ci.org/Stockflare/launcher) [![Code Climate](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/badges/dd3aa794571db1563173/gpa.png)](https://codeclimate.com/repos/530a5106e30ba03a0e009dc2/feed) [![Dependency Status](https://gemnasium.com/davidkelley/launcher.png)](https://gemnasium.com/davidkelley/launcher)
 
 
-The Launcher gem enables you to create, update, delete and interrogate your AWS Cloudformations within a specific region. 
+The Launcher gem enables you to create, update, delete and interrogate your AWS Cloudformations within a specific region.
 
 Whilst enabling you to easily launch your templates, it facilitates cross-dependencies in the form of parameter discovery. This allows
 you to separate your resources into different templates, and layer your infrastructure in a more structured way, whilst still be able to refer to
@@ -38,7 +38,7 @@ Launcher will attempt to discover AWS Credentials from the command line, a confi
 
 #### Creating a Configuration File
 
-1. Create the following file: `~/.aws/config`. Where the `~` symbol represents the path to your user home directory. 
+1. Create the following file: `~/.aws/config`. Where the `~` symbol represents the path to your user home directory.
 2. Insert the following contents, inserting your AWS credentials:
 
 ```
@@ -52,7 +52,7 @@ region=eu-west-1
 
 #### Setting Environment Variables
 
-1. Inside a terminal or environment file, set the following environment variables: 
+1. Inside a terminal or environment file, set the following environment variables:
 
 ```
 AWS_ACCESS_KEY=<your_key>
@@ -114,7 +114,7 @@ to form the name.
 
 #### Example of Launching a new Cloudformation
 
-    $ launcher stack create --name my_application --template path/to/my/application.template --params GitRepo:a_url ImageId:ami-38fa829h 
+    $ launcher stack create --name my_application --template path/to/my/application.template --params GitRepo:a_url ImageId:ami-38fa829h
 
 ### Updating an existing Cloudformation
 
@@ -129,7 +129,7 @@ Furthermore, the template filename in this example has been renamed to `my_appli
 
 ## Contributing
 
-A `Vagrantfile` has been setup to help you boot up an isolated development environment. Whilst this optional, it is definitely preferable. Check out [this blog post](http://davidkelley.me/development/2014/02/24/vagrant-chef-berkshelf-a-match-made-in-heaven.html) on getting started with Vagrant. 
+A `Vagrantfile` has been setup to help you boot up an isolated development environment. Whilst this optional, it is definitely preferable. Check out [this blog post](http://davidkelley.me/development/2014/02/24/vagrant-chef-berkshelf-a-match-made-in-heaven.html) on getting started with Vagrant.
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)

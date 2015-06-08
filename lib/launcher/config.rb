@@ -6,7 +6,7 @@ module Launcher
   #
   # @overload self.Config(config={})
   # @param [Hash] config of keys and values to add.
-  def self.Config(config={})
+  def self.Config(config = {})
     config.each do |key, value|
       Launcher::Config[key] = value
     end
@@ -23,13 +23,13 @@ module Launcher
     #   Launcher::Config.select(:a, :b, :c, :d)
     #
     # @param [Splat] args of the key value pairs to retrieve.
-    # @return [Hash] a hash of the keys present within configuration. 
+    # @return [Hash] a hash of the keys present within configuration.
     def self.select(*args)
       @@_.select { |key| args.include?(key) }
     end
 
     # Accesses {Launcher::Config} as an array of key-based values.
-    # 
+    #
     # @example Retrieve a singular key using a symbol
     #   Launcher::Config[:a]
     # @example Retrieve a singular key using a string
@@ -64,8 +64,17 @@ module Launcher
       keys.each { |k| @@_.delete(k.to_sym) }
     end
 
-    private
+    # Resets configuration by removing all keys and values.
+    #
+    # @example Usage
+    #   Launcher::Config.reset!
+    def self.reset!
       @@_ = {}
+    end
+
+    private
+
+    @@_ = {}
 
   end
 end

@@ -5,10 +5,10 @@ module Launcher
   # create, update, delete and show the current Cloudformations based upon the AWS Access
   # credentials that are provided.
   #
-  # @example Creating a new Cloudformation via the CLI
+  # @example Launching a new Cloudformation via the CLI
   #   launcher stack create --name foo --template path/to/foo.cloudformation
   #
-  # @example Creating a new Cloudformation programatically
+  # @example Launching a new Cloudformation programatically
   #   template = Launcher::Template.new(options[:template])
   #   stack = Launcher::Stack.new("foo", template) do |message|
   #     #output event messages as they happen
@@ -16,6 +16,8 @@ module Launcher
   #   end
   #   stack.create
   class Stack
+
+    CAPABILITIES = %w{CAPABILITY_IAM}
 
     include Launcher::Message
 
@@ -34,6 +36,9 @@ module Launcher
     # Creates a new AWS Cloudformation using a name, template and an
     # optional hash of parameters to be used by the Cloudformation.
     #
+    # @note All Cloudformations have the CAPABILITY_IAM passed into them. This helps to
+    #       ensure the simplicity of launching or updating Cloudformations.
+    #
     # @example Creating a new Cloudformation programatically
     #   template = Launcher::Template.new(options[:template])
     #   stack = Launcher::Stack.new("foo", template) do |message|
@@ -42,11 +47,14 @@ module Launcher
     #   end
     #   stack.create
     def create
-      create_cloudformation if valid?
+      with_client &method(:create_cloudformation) if valid?
     end
 
     # Updates a pre-existing AWS Cloudformation to use an adjusted template
-    # or an updated set of parameters. 
+    # or an updated set of parameters.
+    #
+    # @note All Cloudformations have the CAPABILITY_IAM passed into them. This helps to
+    #       ensure the simplicity of launching or updating Cloudformations.
     #
     # @example Updating a cloudformation via the CLI
     #   launcher stack update --name foo --template path/to/my/updated/foo.cloudformation --params ImageId:ami-31231a
@@ -59,13 +67,13 @@ module Launcher
     #   end
     #   stack.update
     def update
-      update_cloudformation if valid?
+      with_client &method(:update_cloudformation) if valid?
     end
 
     # Delete a pre-existing cloudformation given the name that it has been
     # initialized with.
     def delete
-      delete_cloudformation
+      with_client &method(:delete_cloudformation)
     end
 
     # Retrieves the URL from the Amazon API that determines the estimated cost for the
@@ -78,29 +86,26 @@ module Launcher
     #
     # @return [String] the url to estimate the template cost.
     def cost
-      if aws_configured? && valid?
-        url = cloudformation.estimate_template_cost(@template.read, filtered_parameters)
-        message url, :type => :ok
-        return url
-      else
-        message "AWS not configured.", :type => :fatal
-      end
+      with_client do |client|
+        response = client.estimate_template_cost({
+          template_body: template.read,
+          parameters: parameters
+        })
+        message response[:url], type: :ok
+      end if valid?
     end
 
-    # The parameters array that will be passed into the Cloudformation during 
+    # The parameters array that will be passed into the Cloudformation during
     # creation or update. The :parameters key contains a list of filtered parameters
     # that are a subset of all the discoverable environment parameters, that are
     # neither defaulted or provided via the CLI.
-
-    # @note All Cloudformations have the CAPABILITY_IAM passed into them. This helps to
-    #       ensure the simplicity of launching or updating Cloudformations.
+    #
     #
     # @return [Hash] The parameter object that will be passed into the Cloudformation.
     def parameters
-      {
-        :parameters => filtered_parameters,
-        :capabilities => ["CAPABILITY_IAM"]
-      }
+      filtered_parameters.to_a.collect do |param|
+        { parameter_key: param[0], parameter_value: param[1] }
+      end
     end
 
     # Hash of the filtered parameter set for use within the Cloudformation. This
@@ -109,8 +114,8 @@ module Launcher
     #
     # @return [Hash] Set of parameters that cannot be discovered and will be passed into the Cloudformation.
     def filtered_parameters
-      required = @template.non_defaulted_parameters
-      @discovered_parameters.reject { |k| !required.include?(k) }
+      required = template.non_defaulted_parameters
+      discovered_parameters.reject { |k| !required.include?(k) }
     end
 
     # An array of required parameter keys that are missing from the Cloudformation. If a key
@@ -118,11 +123,11 @@ module Launcher
     #
     # @return [Array] List of keys that are missing from the AWS Cloudformation.
     def missing_parameters
-      @template.non_defaulted_parameters.keys - filtered_parameters.keys
+      template.non_defaulted_parameters.keys - filtered_parameters.keys
     end
 
     # Determines if the Cloudformation is requiring parameters that have not been discovered
-    # and/or are missing. 
+    # and/or are missing.
     #
     # @return [Boolean] True if parameters are missing, false otherwise.
     def missing_parameters?
@@ -138,54 +143,65 @@ module Launcher
       #presume everything is valid
       valid = true
 
-      valid = @template.valid?
-      @template.messages { |m,o| message m,o } unless valid
+      valid = template.valid?
+      template.messages { |m,o| message m,o } unless valid
 
       valid = !missing_parameters?
-      missing_parameters.each { |m| message "The parameter [#{m.to_s}] is required.", :type => :fatal } unless valid
+      missing_parameters.each { |m| message "The parameter [#{m.to_s}] is required.", type: :fatal } unless valid
 
       return valid
     end
 
     private
 
-      def delete_cloudformation
-        message "Attempting to delete stack with name #{@name}"
-        with_cloudformation { |cf| 
-          cf.stacks[@name].delete 
-          message "Deleting Cloudformation with name #{@name}.", :type => :ok
-        }
+    def delete_cloudformation(client)
+      client.delete_stack({ stack_name: name })
+    end
+
+    def update_cloudformation(client)
+      client.update_stack(payload)
+    end
+
+    def create_cloudformation(client)
+      client.create_stack(payload)
+      client.wait_until :stack_create_complete, &method(:waiter)
+    end
+
+    def payload
+      {
+        stack_name: name,
+        template_body: template.read,
+        capabilities: CAPABILITIES,
+        parameters: parameters
+      }
+    end
+
+    def with_client(verb)
+      message "Modifying stack #{name}"
+      yield client
+    rescue => e
+      message e.message, type: :fatal
+    else
+      message "Completed successfully.", type: :ok
+    end
+
+    def waiter(waiter)
+
+      # disable max attempts
+      waiter.max_attempts = nil
+
+      # poll for 1 hour, instead of a number of attempts
+      before_wait do |attempts, response|
+        throw :failure if Time.now - started_at > 3600
       end
 
-      def update_cloudformation
-        message "Attempting to update stack with name #{@name}"
-        with_cloudformation { |cf| cf.stacks[@name].update parameters.merge(:template => @template.read) }
-      end
+      puts "here..."
 
-      def create_cloudformation
-        message "Attempting to create stack with name #{@name}."
-        with_cloudformation { |cf| cf.stacks.create(@name, @template.read, parameters) }
-      end
+    end
 
-      def with_cloudformation
-        begin
-          if aws_configured?
-            yield cloudformation
-          else
-            raise new Error "AWS not configured."
-          end
-        rescue => e
-          message e.message, :type => :fatal
-        end
-      end
+    def client
+      Launcher.cloudformation_client
+    end
 
-      def aws_configured?
-        Launcher::Config::AWS.configured?
-      end
-
-      def cloudformation
-        AWS::CloudFormation.new
-      end
-      
   end
 end

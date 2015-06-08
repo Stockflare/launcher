@@ -1,6 +1,3 @@
-require "launcher/config/aws/environment"
-require "launcher/config/aws/config_file"
-
 module Launcher
   module Config
     # Handles AWS Configuration for the Launcher gem. This module can be included
@@ -9,6 +6,10 @@ module Launcher
     #
     # See the AWS configuration setup for more information.
     module AWS
+
+      # Valid AWS Configuration keys
+      KEYS = %i{access_key_id secret_access_key region profile}
+
       # Retrieves a specific AWS Configuration key. Note that
       # the values retrieved are filtered based upon valid AWS
       # configuration keys.
@@ -19,43 +20,42 @@ module Launcher
       # @param [Symbol] key to use to retrieve a value.
       # @return [String,Nil] the value stored under the key.
       def self.[](key)
-        configuration[key] if @@keys.include?(key)
+        Config[key] if KEYS.include? key
       end
 
-      # Determines if AWS configuration values are set within the current
-      # state of {Launcher::Config}.
+      # Returns a configuration hash that is compatible with Aws Client classes.
       #
-      # @return [Boolean] True if AWS configuration is present, false otherwise.
-      def self.configured?
-        configuration.length >= 2
-      end
-
-      # Retreives and attempts to discover all set AWS configuration 
-      # values from the current {Launcher::Config} state. This function
-      # will return configurable values that have been set in command parameters,
-      # the environment and finally any configuration file, respectively.
+      # @see http://docs.aws.amazon.com/sdkforruby/api/Seahorse/Client/Base.html
       #
-      # @return [Hash,Nil] the current AWS Configuration values
+      # @return [Hash] the current AWS Configuration
       def self.configuration
-        if aws_configuration.length < 2
-          if self::Environment.present?
-            Launcher::Config(self::Environment.configuration)
-          elsif self::ConfigFile.present?
-            Launcher::Config(self::ConfigFile.configuration)
-          end
+        { region: region, credentials: credentials }
+      end
+
+      def self.credentials
+        if profile?
+          Aws::SharedCredentials.new(profile_name: self[:profile])
+        elsif keys?
+          Aws::Credentials.new(self[:access_key_id], self[:secret_access_key])
+        else
+          nil
         end
-        ::AWS.config(aws_configuration)
-        aws_configuration
+      end
+
+      def self.region
+        self[:region]
       end
 
       private
 
-        @@keys = [:access_key_id, :secret_access_key, :region]
+      def self.profile?
+        self[:profile]
+      end
 
-        def self.aws_configuration
-          Launcher::Config.select(*@@keys)
-        end
-      
+      def self.keys?
+        self[:access_key_id] && self[:secret_access_key]
+      end
+
     end
   end
 end

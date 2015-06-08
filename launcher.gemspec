@@ -19,18 +19,15 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "thor"
-  spec.add_dependency "aws-sdk", "< 2.0"
+  spec.add_dependency "aws-sdk", "~> 2"
   spec.add_dependency "colored"
   spec.add_dependency "terminal-table"
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rspec", "~> 2.6"
+  spec.add_development_dependency "rspec", "~> 3"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "redcarpet"
-  spec.add_development_dependency "cucumber"
-  spec.add_development_dependency "aruba"
-  spec.add_development_dependency "fakefs"
   spec.add_development_dependency "factory_girl"
   spec.add_development_dependency "codeclimate-test-reporter"
   spec.add_development_dependency 'coveralls'

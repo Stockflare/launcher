@@ -5,46 +5,81 @@ require "launcher/config/aws"
 
 describe Launcher::Config::AWS do
 
-  let(:test_data) { { :access_key_id => "aki", :secret_access_key => "sak" } }
+  let(:test_data) { { access_key_id: "aki", secret_access_key: "sak", region: 'us-east-1' } }
 
-  it "should be present" do
-    expect(subject).to_not be_nil
+  after { Launcher::Config.reset! }
+
+  it { should respond_to(:configuration) }
+
+  it { should respond_to(:credentials) }
+
+  it { should respond_to(:region) }
+
+  describe 'return value of #[]' do
+
+    before { Launcher::Config(test_data) }
+
+    subject { Launcher::Config::AWS[test_data.keys.sample] }
+
+    it { should be_a String }
+
+    it { should_not be_empty }
+
+    specify { expect(test_data.values).to include subject }
+
   end
 
-  describe "when configuration is set" do
-    before {
-      Launcher::Config(test_data)
-    }
+  describe 'return value of #configuration with a profile' do
 
-    it "should set configuration" do
-      expect(subject.configuration).to eq test_data
+    before { Launcher::Config(profile: 'test') }
+
+    subject { Launcher::Config::AWS.configuration }
+
+    describe 'nested credentials' do
+
+      subject { Launcher::Config::AWS.configuration[:credentials] }
+
+      it { should be_an_instance_of Aws::SharedCredentials }
+
+      specify { expect(subject.loadable?).to be_falsey }
+
     end
 
-    it "should filter configuration" do
-      Launcher::Config(test_data.merge(:another_key => true))
-      expect(subject.configuration).to eq test_data
-    end
-
-    it "should return a specific key" do
-      expect(subject[test_data.keys.first]).to eq test_data.values.first
-    end
-
-    it "should be configured?" do
-      expect(subject.configured?).to be_truthy
-    end
   end
 
-  describe "when configuration is not set" do
+  describe 'return value of #configuration with keys' do
 
-    before { Launcher::Config.delete!(:access_key_id, :secret_access_key) }
+    before { Launcher::Config(test_data) }
 
-    it "should not be configured?" do
-      expect(subject.configured?).to_not be_truthy
+    subject { Launcher::Config::AWS.configuration }
+
+    it { should be_a Hash }
+
+    it { should_not be_empty }
+
+    describe 'nested credentials' do
+
+      subject { Launcher::Config::AWS.configuration[:credentials] }
+
+      it { should be_an_instance_of Aws::Credentials }
+
+      specify { expect(subject.access_key_id).to eq test_data[:access_key_id] }
+
+      specify { expect(subject.secret_access_key).to eq test_data[:secret_access_key] }
+
     end
 
-    it "should not return configuration" do
-      expect(subject.configuration).to eq({})
+    describe 'nested region' do
+
+      subject { Launcher::Config::AWS.configuration[:region] }
+
+      it { should be_a String }
+
+      it { should eq test_data[:region] }
+
     end
+
+
   end
 
 end
