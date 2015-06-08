@@ -22,8 +22,8 @@ module Launcher
       # @return nil
       def outputs(&block)
         stacks.each do |stack|
-          stack[:outputs].each do |output|
-            block.call output[:ouput_key].to_sym, output[:output_value]
+          stack.outputs.each do |output|
+            block.call output.output_key.to_sym, output.output_value
           end
         end
       end
@@ -32,7 +32,7 @@ module Launcher
       # an enumerable list of pre-existing Cloudformation stacks that have been
       # detected using the credentials defined.
       #
-      # @return [Array] array of existing stacks.
+      # @return [PageableResponse] array of existing stacks.
       def stacks
         client.describe_stacks[:stacks]
       end

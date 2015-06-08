@@ -4,8 +4,6 @@ require 'launcher/parameters/configs'
 
 describe Launcher::Parameters::Configs do
 
-  include FakeFS::SpecHelpers
-
   let(:file_path) { "example.configuration.yml" }
 
   let(:config_contents) {
@@ -18,10 +16,7 @@ describe Launcher::Parameters::Configs do
   }
 
   before do
-    File.open(file_path, "wb") do |f|
-      f.write config_contents.to_yaml
-    end
-
+    File.open(file_path, "wb") { |f| f.write config_contents.to_yaml }
     Launcher::Config(:config_files => [file_path])
     @configs = Launcher::Parameters::Configs.new
   end

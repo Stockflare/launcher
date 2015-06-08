@@ -25,7 +25,7 @@ module Launcher
     class_option :access_key_id, type: :string
     class_option :secret_access_key, type: :string
     class_option :region, type: :string, default: 'us-east-1'
-    class_option :profile, type: :string, default: 'default'
+    class_option :profile, type: :string
 
     def initialize(*args)
       super
@@ -76,23 +76,23 @@ module Launcher
 
     private
 
-      def aws_configuration
-        Launcher::Config::AWS.configuration
-      end
+    def aws_configuration
+      Launcher::Config::AWS.configuration
+    end
 
-      def aws_configured?
-        aws_configuration.has_key?(:access_key_id) && aws_configuration.has_key?(:secret_access_key)
-      end
+    def aws_configured?
+      aws_configuration[:credentials] != nil
+    end
 
-      def describe_aws_configuration
-        if aws_configured?
-          config = aws_configuration
-          Launcher::Log.info "AWS Region #{config[:region]}"
-          Launcher::Log.info "AWS Access Key #{config[:access_key_id]}"
-        else
-          Launcher::Log.warn "No AWS config detected."
-        end
+    def describe_aws_configuration
+      if aws_configured?
+        config = aws_configuration
+        Launcher::Log.info "AWS Region #{config[:region]}"
+        Launcher::Log.info "AWS Access Key #{config[:access_key_id]}"
+      else
+        Launcher::Log.warn "No AWS config detected."
       end
+    end
 
   end
 end

@@ -4,16 +4,12 @@ require 'launcher/template'
 
 describe Launcher::Template do
 
-  include FakeFS::SpecHelpers
-
   let(:file_path) { "file.cloudformation" }
 
   let(:template) { build(:template) }
 
   before do
-    File.open(file_path, "wb") do |f|
-      f.write template.to_json
-    end
+    File.open(file_path, "wb") { |f| f.write template.to_json }
     @template = Launcher::Template.new(file_path)
   end
 
@@ -87,8 +83,8 @@ describe Launcher::Template do
 
         before {
           Launcher::Config::AWS.stub(:configured?) { true }
-          AWS::CloudFormation.any_instance.stub(:validate_template) { 
-            { :message => aws_error_message } 
+          AWS::CloudFormation.any_instance.stub(:validate_template) {
+            { :message => aws_error_message }
           }
         }
 
@@ -188,5 +184,5 @@ describe Launcher::Template do
       expect(@template.outputs).to eq(template[:Outputs])
     end
   end
-  
+
 end

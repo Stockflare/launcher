@@ -23,6 +23,8 @@ module Launcher
 
     attr_reader :name, :template, :discovered_parameters
 
+    attr_accessor :events
+
     # Creates a new instance of {Launcher::Stack}. Setting the template name,
     # the template and setting the discovered parameters to be passed to the
     # Cloudformation.
@@ -30,6 +32,7 @@ module Launcher
       @name = name
       @template = template
       @discovered_parameters = params
+      @events = []
       message_handler &block if block
     end
 
@@ -155,15 +158,19 @@ module Launcher
     private
 
     def delete_cloudformation(client)
+      message "Deleting stack #{name}..."
       client.delete_stack({ stack_name: name })
     end
 
     def update_cloudformation(client)
-      client.update_stack(payload)
+      message "Updating stack #{name}..."
+      client.update_stack(payload).stack_id
+      client.wait_until :stack_update_complete, &method(:waiter)
     end
 
     def create_cloudformation(client)
-      client.create_stack(payload)
+      message "Creating stack #{name}..."
+      client.create_stack(payload).stack_id
       client.wait_until :stack_create_complete, &method(:waiter)
     end
 
@@ -176,9 +183,9 @@ module Launcher
       }
     end
 
-    def with_client(verb)
-      message "Modifying stack #{name}"
+    def with_client
       yield client
+      on_wait if events.length
     rescue => e
       message e.message, type: :fatal
     else
@@ -186,17 +193,24 @@ module Launcher
     end
 
     def waiter(waiter)
+      waiter.delay = 5
+      on_wait
+    end
 
-      # disable max attempts
-      waiter.max_attempts = nil
-
-      # poll for 1 hour, instead of a number of attempts
-      before_wait do |attempts, response|
-        throw :failure if Time.now - started_at > 3600
+    def on_wait
+      new_events = client.describe_stack_events(stack_name: name)[:stack_events]
+      if !events.empty? && diff = new_events.length - events.length
+        new_events.sort_by(&:timestamp)[0...diff].each &method(:event_handler)
       end
+      self.events = new_events
+    end
 
-      puts "here..."
-
+    def event_handler(event)
+      resource = event.logical_resource_id
+      status = event.resource_status
+      msg = event.resource_status_reason
+      str = "[#{resource}] [#{status}]: #{msg}"
+      message [resource, status, msg], type: :info
     end
 
     def client

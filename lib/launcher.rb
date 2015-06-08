@@ -1,5 +1,3 @@
-require 'aws-sdk'
-
 require "launcher/version"
 require "launcher/config"
 
@@ -26,6 +24,17 @@ module Launcher
     @client ||= Aws::CloudFormation::Client.new Launcher::Config::AWS.configuration
   end
 
+  # For testing purposes, stubs the cloudformation client so that no HTTP requests
+  # are made and stubbed responses can be generated.
+  #
+  # @note This method should never be used outside of a testing environment, as it
+  #   will cause all other aws-related actions to have no effect.
+  #
+  # @return void
+  def self.stub!
+    @client = Aws::CloudFormation::Client.new stub_responses: true
+  end
+
   # Provides classes with the ability to store messages for consumption
   # elsewhere within the application. Typically via the CLI.
   #
@@ -39,6 +48,7 @@ module Launcher
   module Message
 
     attr :messages
+
     attr_reader :message_proc
 
     # Binds a message handler to proc a block when a message
@@ -67,9 +77,9 @@ module Launcher
 
     private
 
-      def proc_with_message(msg, &block)
-        block.call(msg[:message], msg)
-      end
+    def proc_with_message(msg, &block)
+      block.call(msg[:message], msg)
+    end
 
   end
 

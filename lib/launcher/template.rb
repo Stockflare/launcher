@@ -2,7 +2,7 @@ require 'json'
 
 module Launcher
   # Loads a pre-existing AWS Cloudformation template, that has a valid JSON structure.
-  # This class is able to retrieve different parts of the Cloudformation, as well as 
+  # This class is able to retrieve different parts of the Cloudformation, as well as
   # modify its contents and return them in a JSON encoded string.
   #
   # @example Loading an AWS Cloudformation Template
@@ -19,7 +19,7 @@ module Launcher
 
     def initialize(file_path)
       @file_path = file_path
-      @json = JSON.parse(read, :symbolize_names => true)
+      @json = JSON.parse(read, symbolize_names: true)
     end
 
     # Retrieve the name of the template. The name is derived such that
@@ -36,7 +36,7 @@ module Launcher
     #
     # @return [String] the full filename.
     def filename
-      Pathname.new(@file_path).basename.to_s
+      Pathname.new(file_path).basename.to_s
     end
 
     # Return the file handler for the template filepath that the class has been
@@ -44,14 +44,18 @@ module Launcher
     #
     # @return [File] open file handle with read-in-binary permissions.
     def file
-      File.open(@file_path, "rb")
+      File.open(file_path, "rb")
     end
 
     # Return the template files contents as a string.
     #
     # @return [String] The templates file contents with newline characters.
     def read
-      File.read(@file_path)
+      @contents ||= if (read = File.read(file_path)).empty?
+        '{}'
+      else
+        read
+      end
     end
 
     # Return the loaded templates Cloudformation Parameters as a Hash.
@@ -87,23 +91,11 @@ module Launcher
     # @return [Boolean] True if the template is valid, false otherwise.
     def valid?
       valid = true
-
-      if aws_configured?
-        validation = cloudformation.validate_template(read)
-        if validation.has_key?(:message)
-          message validation[:message], :type => :fatal
-          valid = false
-        end
-      else
-        message "Skipped AWS Cloudformation template validation.", :type => :warn
-      end
-
       if resources.keys.empty?
         message "Atleast once templated resource must be defined.", :type => :fatal
         valid = false
       end
-
-      return valid
+      valid
     end
 
     # Returns a subset of the Cloudformation parameters that contain defaulted values.
@@ -114,23 +106,13 @@ module Launcher
     end
 
     # Returns a subset of the Cloudformation parameters that do not contain default values.
-    # These parameters indicate that they need to be passed in to the cloudformation upon 
+    # These parameters indicate that they need to be passed in to the cloudformation upon
     # creation or update.
     #
     # @return [Hash] A hash of the non-defaulted parameters for the loaded Cloudformation.
     def non_defaulted_parameters
       parameters.reject { |k| defaulted_parameters.keys.include?(k) }
     end
-
-    private
-
-      def cloudformation
-        AWS::CloudFormation.new
-      end
-
-      def aws_configured?
-        Launcher::Config::AWS.configured?
-      end
 
   end
 end

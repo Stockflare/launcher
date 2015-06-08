@@ -8,6 +8,8 @@ require 'aws-sdk'
 require 'factory_girl'
 require 'launcher'
 
+Launcher.stub!
+
 Dir["./spec/support/**/*.rb"].sort.each {|f| require f}
 
 FactoryGirl.find_definitions
@@ -15,10 +17,5 @@ FactoryGirl.find_definitions
 RSpec.configure do |config|
 
   config.include FactoryGirl::Syntax::Methods
-
-  config.before :all, type: :request do
-    puts "ERE"
-    Launcher.stub(:cloudformation_client).with(Aws::Cloudformation::Client.new(stub_response: true))
-  end
 
 end
